@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useDashboard } from '@/context/DashboardContext';
 
 const budgetData = [
   { category: 'Housing', budget: 3500, actual: 3500 },
@@ -24,26 +25,17 @@ const expenseCategories = [
   { name: 'Other', value: 970, color: '#64748B' },
 ];
 
-const initialTransactions = [
-  { id: 1, desc: 'AAPL Stock Purchase', amount: -4750, date: 'Today', category: 'Investment' },
-  { id: 2, desc: 'Salary Deposit', amount: 24500, date: 'Yesterday', category: 'Income' },
-  { id: 3, desc: 'Monthly Rent', amount: -3500, date: 'Dec 1', category: 'Housing' },
-  { id: 4, desc: 'Dividend — BRK.B', amount: 312, date: 'Nov 30', category: 'Dividend' },
-  { id: 5, desc: 'Grocery Shopping', amount: -245, date: 'Nov 29', category: 'Food' },
-  { id: 6, desc: 'Netflix Subscription', amount: -18, date: 'Nov 28', category: 'Entertainment' },
-];
-
-const initialGoals = [
-  { id: 1, name: 'Emergency Fund', target: 50000, current: 42000, color: 'bg-emerald-500' },
-  { id: 2, name: 'Down Payment', target: 200000, current: 145000, color: 'bg-blue-500' },
-  { id: 3, name: 'College Fund', target: 100000, current: 38000, color: 'bg-purple-500' },
-  { id: 4, name: 'Vacation', target: 15000, current: 9500, color: 'bg-amber-500' },
-];
-
 export default function FinancePage() {
+  const {
+    transactions,
+    goals,
+    addTransaction: addTxCtx,
+    deleteTransaction: deleteTxCtx,
+    addGoal: addGoalCtx,
+    contributeToGoal: contributeToGoalCtx
+  } = useDashboard();
+
   const [activeTab, setActiveTab] = useState<'overview' | 'transactions' | 'goals' | 'budget'>('overview');
-  const [transactions, setTransactions] = useState(initialTransactions);
-  const [goals, setGoals] = useState(initialGoals);
   const [showAddTx, setShowAddTx] = useState(false);
   const [newTx, setNewTx] = useState({ desc: '', amount: '', category: 'Other', type: 'expense' });
   const [showAddGoal, setShowAddGoal] = useState(false);
@@ -52,39 +44,27 @@ export default function FinancePage() {
 
   const addTransaction = () => {
     if (!newTx.desc || !newTx.amount) return toast.error('Please fill in all fields');
-    const amount = parseFloat(newTx.amount) * (newTx.type === 'expense' ? -1 : 1);
-    setTransactions(prev => [{ id: Date.now(), desc: newTx.desc, amount, date: 'Today', category: newTx.category }, ...prev]);
+    addTxCtx(newTx.desc, parseFloat(newTx.amount), newTx.category, newTx.type as any);
     setNewTx({ desc: '', amount: '', category: 'Other', type: 'expense' });
     setShowAddTx(false);
-    toast.success('Transaction added successfully');
   };
 
   const deleteTransaction = (id: number) => {
-    setTransactions(prev => prev.filter(t => t.id !== id));
-    toast.success('Transaction removed');
+    deleteTxCtx(id);
   };
 
   const addGoal = () => {
     if (!newGoal.name || !newGoal.target) return toast.error('Please fill in all fields');
-    const colors = ['bg-emerald-500', 'bg-blue-500', 'bg-purple-500', 'bg-amber-500', 'bg-red-500'];
-    setGoals(prev => [...prev, {
-      id: Date.now(),
-      name: newGoal.name,
-      target: parseFloat(newGoal.target),
-      current: parseFloat(newGoal.current) || 0,
-      color: colors[prev.length % colors.length],
-    }]);
+    addGoalCtx(newGoal.name, parseFloat(newGoal.target), parseFloat(newGoal.current) || 0);
     setNewGoal({ name: '', target: '', current: '' });
     setShowAddGoal(false);
-    toast.success('Savings goal created!');
   };
 
   const contributeToGoal = (goalId: number) => {
     const amount = parseFloat(goalContrib[goalId] || '0');
     if (!amount || isNaN(amount)) return toast.error('Enter a valid amount');
-    setGoals(prev => prev.map(g => g.id === goalId ? { ...g, current: Math.min(g.current + amount, g.target) } : g));
+    contributeToGoalCtx(goalId, amount);
     setGoalContrib(prev => ({ ...prev, [goalId]: '' }));
-    toast.success(`Added $${amount.toLocaleString()} to goal!`);
   };
 
   const income = transactions.filter(t => t.amount > 0).reduce((a, t) => a + t.amount, 0);

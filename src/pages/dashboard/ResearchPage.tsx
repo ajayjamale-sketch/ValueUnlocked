@@ -1,9 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Search, Star, TrendingUp, TrendingDown, BarChart2, Filter, Eye, Plus, X, ChevronDown, ChevronUp } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { useDashboard } from '@/context/DashboardContext';
 
 const stocks = [
   { symbol: 'AAPL', name: 'Apple Inc.', sector: 'Technology', price: 189.50, change: 1.24, pE: 31.2, eps: 6.08, roe: 145.0, score: 88, rating: 'Buy', mktCap: '$2.9T', revenue: '$394B', dividend: '0.5%' },
@@ -24,9 +26,21 @@ const ratingColors: Record<string, string> = {
 };
 
 export default function ResearchPage() {
+  const { watchlist, toggleWatchlist, addPosition } = useDashboard();
+  const [searchParams] = useSearchParams();
+  const symbolParam = searchParams.get('symbol');
   const [query, setQuery] = useState('');
-  const [watchlist, setWatchlist] = useState<string[]>(['AAPL', 'NVDA']);
   const [selectedStock, setSelectedStock] = useState<typeof stocks[0] | null>(null);
+  
+  useEffect(() => {
+    if (symbolParam) {
+      const found = stocks.find(s => s.symbol.toUpperCase() === symbolParam.toUpperCase());
+      if (found) {
+        setSelectedStock(found);
+      }
+    }
+  }, [symbolParam]);
+
   const [activeTab, setActiveTab] = useState<'screener' | 'watchlist'>('screener');
   const [sortKey, setSortKey] = useState<'score' | 'change' | 'pE'>('score');
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
@@ -54,13 +68,6 @@ export default function ResearchPage() {
 
   const watchlistStocks = stocks.filter(s => watchlist.includes(s.symbol));
 
-  const toggleWatchlist = (symbol: string) => {
-    setWatchlist(prev =>
-      prev.includes(symbol) ? prev.filter(s => s !== symbol) : [...prev, symbol]
-    );
-    toast.success(watchlist.includes(symbol) ? `Removed ${symbol} from watchlist` : `Added ${symbol} to watchlist`);
-  };
-
   const handleSort = (key: typeof sortKey) => {
     if (sortKey === key) setSortDir(d => d === 'desc' ? 'asc' : 'desc');
     else { setSortKey(key); setSortDir('desc'); }
@@ -75,12 +82,25 @@ export default function ResearchPage() {
     }, 1200);
   };
 
+  const handleBuyStock = () => {
+    if (!selectedStock) return;
+    const qtyStr = window.prompt(`Enter quantity of ${selectedStock.symbol} to buy at $${selectedStock.price}:`, "10");
+    if (qtyStr === null) return;
+    const qty = parseInt(qtyStr);
+    if (isNaN(qty) || qty <= 0) {
+      toast.error('Please enter a valid quantity.');
+      return;
+    }
+    addPosition(selectedStock.symbol, selectedStock.name, 'stock', qty, selectedStock.price);
+    setSelectedStock(null);
+  };
+
   return (
     <div className="space-y-6">
       {/* Detail Modal */}
       {selectedStock && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setSelectedStock(null)}>
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedStock(null)}>
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-5">
               <div>
                 <h2 className="text-2xl font-bold text-slate-800 dark:text-white">{selectedStock.symbol}</h2>
@@ -119,7 +139,7 @@ export default function ResearchPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Button className="flex-1 gradient-growth text-white border-0" onClick={() => { toast.success(`${selectedStock.symbol} added to portfolio`); setSelectedStock(null); }}>
+              <Button className="flex-1 gradient-growth text-white border-0" onClick={handleBuyStock}>
                 Add to Portfolio
               </Button>
               <Button variant="outline" className="flex-1" onClick={() => { toggleWatchlist(selectedStock.symbol); setSelectedStock(null); }}>

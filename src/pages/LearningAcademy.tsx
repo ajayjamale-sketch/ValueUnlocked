@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getStoredUser } from '@/lib/auth';
 
 const extraCourses = [
   { id: '5', title: 'Technical Analysis Masterclass', instructor: 'Price Action & Charts', category: 'Technical', level: 'intermediate' as const, duration: '16h', enrolled: 18200, rating: 4.8, price: 199, image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=225&fit=crop' },
@@ -27,23 +28,61 @@ const levelColors: Record<string, string> = {
 };
 
 export default function LearningAcademy() {
+  const navigate = useNavigate();
+  const user = getStoredUser();
   const [query, setQuery] = useState('');
   const [level, setLevel] = useState('All');
   const [category, setCategory] = useState('All');
-  const [enrolledCourses, setEnrolledCourses] = useState<string[]>(['1', '2']);
 
-  const filtered = allCourses.filter(c =>
+  // Load and merge courses state from localStorage to check which are enrolled/have progress
+  const [localCourses, setLocalCourses] = useState(() => {
+    const stored = localStorage.getItem('vu_courses');
+    let dbCoursesList = courses;
+    if (stored) {
+      try {
+        dbCoursesList = JSON.parse(stored);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+    // Merge allCourses and dbCoursesList by ID. If a course is in dbCoursesList, use it (since it might have progress).
+    // Otherwise, use the one from allCourses.
+    const merged = allCourses.map(ac => {
+      const match = dbCoursesList.find(dc => dc.id === ac.id);
+      return match ? match : ac;
+    });
+    return merged;
+  });
+
+  const filtered = localCourses.filter(c =>
     (level === 'All' || c.level.toLowerCase() === level.toLowerCase()) &&
     (category === 'All' || c.category === category) &&
     (c.title.toLowerCase().includes(query.toLowerCase()) || c.category.toLowerCase().includes(query.toLowerCase()))
   );
 
   const handleEnroll = (course: typeof allCourses[0]) => {
-    if (enrolledCourses.includes(course.id)) {
+    if (!user) {
+      toast.info('Please sign in to enroll in courses.');
+      navigate('/login');
+      return;
+    }
+
+    const isEnrolled = course.progress !== undefined;
+    if (isEnrolled) {
       toast.info(`Resuming: ${course.title}`);
+      navigate('/dashboard/learning', { state: { openCourseId: course.id } });
     } else {
-      setEnrolledCourses(prev => [...prev, course.id]);
+      const updated = localCourses.map(c => {
+        if (c.id === course.id) {
+          return { ...c, progress: 0 };
+        }
+        return c;
+      });
+      setLocalCourses(updated);
+      // Synchronize with dashboard storage key
+      localStorage.setItem('vu_courses', JSON.stringify(updated));
       toast.success(`Enrolled in: ${course.title}`);
+      navigate('/dashboard/learning', { state: { openCourseId: course.id } });
     }
   };
 
@@ -106,7 +145,7 @@ export default function LearningAcademy() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map(course => {
-              const isEnrolled = enrolledCourses.includes(course.id);
+              const isEnrolled = course.progress !== undefined;
               return (
                 <div key={course.id} className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 overflow-hidden hover:border-emerald-500/30 hover:shadow-lg transition-all group">
                   <div className="relative">

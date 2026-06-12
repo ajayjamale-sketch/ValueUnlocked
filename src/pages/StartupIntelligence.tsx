@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, TrendingUp, Users, DollarSign, Star, Globe, Search, BookmarkPlus, BarChart3, X, Filter } from 'lucide-react';
+import { Zap, TrendingUp, Users, DollarSign, Star, Globe, Search, BookmarkPlus, BarChart3, X, Filter, RefreshCw, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import { Link } from 'react-router-dom';
+import { getStoredUser } from '@/lib/auth';
 
 const allStartups = [
   { id: '1', name: 'NeuralVault AI', stage: 'Series B', sector: 'AI/ML', valuation: '$420M', mrr: '$1.2M', growth: '+340%', team: 85, score: 94, founded: 2021, country: 'USA', investors: 'a16z, Sequoia', description: 'AI-powered enterprise security platform with 97% threat detection accuracy.', raising: '$80M' },
@@ -41,6 +42,40 @@ export default function StartupIntelligence() {
   const [selected, setSelected] = useState<typeof allStartups[0] | null>(null);
   const [sortBy, setSortBy] = useState<'score' | 'valuation' | 'growth'>('score');
 
+  // Express Interest Form States
+  const [expressingInterest, setExpressingInterest] = useState(false);
+  const [interestSubmitting, setInterestSubmitting] = useState(false);
+  const [interestSubmitted, setInterestSubmitted] = useState(false);
+  const [interestForm, setInterestForm] = useState({ name: '', email: '', amount: '$50k - $250k', message: '' });
+
+  const handleOpenDetail = (startup: typeof allStartups[0]) => {
+    const user = getStoredUser();
+    setSelected(startup);
+    setExpressingInterest(false);
+    setInterestSubmitted(false);
+    setInterestSubmitting(false);
+    setInterestForm({
+      name: user?.name || '',
+      email: user?.email || '',
+      amount: '$50k - $250k',
+      message: `I am interested in learning more about ${startup.name}’s ${startup.stage} round.`
+    });
+  };
+
+  const handleSubmitInterest = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!interestForm.name || !interestForm.email) {
+      toast.error('Please fill in required fields.');
+      return;
+    }
+    setInterestSubmitting(true);
+    setTimeout(() => {
+      setInterestSubmitting(false);
+      setInterestSubmitted(true);
+      toast.success(`Expression of interest submitted for ${selected?.name}!`);
+    }, 1200);
+  };
+
   const filtered = allStartups
     .filter(s =>
       (sector === 'All' || s.sector === sector) &&
@@ -64,53 +99,146 @@ export default function StartupIntelligence() {
 
       {/* Detail Modal */}
       {selected && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-start justify-between mb-4">
-              <div>
-                <h2 className="text-xl font-bold text-slate-800 dark:text-white">{selected.name}</h2>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge className={`text-xs border-0 ${sectorColors[selected.sector] || 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'}`}>{selected.sector}</Badge>
-                  <span className="text-xs text-slate-400">{selected.stage} · {selected.country}</span>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelected(null)}>
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150 text-left" onClick={e => e.stopPropagation()}>
+            
+            {expressingInterest ? (
+              interestSubmitted ? (
+                <div className="flex flex-col items-center justify-center py-8 text-center">
+                  <div className="w-16 h-16 gradient-growth rounded-2xl flex items-center justify-center mb-4 text-white">
+                    <CheckCircle2 className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Interest Expressed!</h3>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mb-6 leading-relaxed">
+                    Your request has been securely logged. The founding team of {selected.name} and your assigned ValueUnlocked representative will reach out to you within 24 hours.
+                  </p>
+                  <Button className="gradient-growth text-white border-0 text-sm px-6" onClick={() => setSelected(null)}>
+                    Close
+                  </Button>
                 </div>
-              </div>
-              <button onClick={() => setSelected(null)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
-                <X className="w-4 h-4 text-slate-400" />
-              </button>
-            </div>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{selected.description}</p>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-              {[
-                { label: 'Valuation', value: selected.valuation },
-                { label: 'MRR', value: selected.mrr },
-                { label: 'Growth', value: selected.growth, color: 'text-emerald-500' },
-                { label: 'Team', value: `${selected.team}` },
-                { label: 'Founded', value: selected.founded.toString() },
-                { label: 'AI Score', value: `${selected.score}/100`, color: 'text-purple-500' },
-              ].map((item, i) => (
-                <div key={i} className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 text-center">
-                  <p className="text-xs text-slate-400 mb-1">{item.label}</p>
-                  <p className={`text-sm font-bold ${(item as any).color || 'text-slate-800 dark:text-white'}`}>{item.value}</p>
+              ) : (
+                <form onSubmit={handleSubmitInterest} className="space-y-4">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-white/10">
+                    <h3 className="font-bold text-slate-800 dark:text-white text-base">Express Interest: {selected.name}</h3>
+                    <button type="button" onClick={() => setExpressingInterest(false)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
+                      <X className="w-4 h-4 text-slate-400" />
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">Full Name</label>
+                    <Input
+                      type="text"
+                      required
+                      value={interestForm.name}
+                      onChange={e => setInterestForm(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="Your name"
+                      className="text-xs text-slate-850 dark:text-white bg-white dark:bg-navy"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">Email Address</label>
+                    <Input
+                      type="email"
+                      required
+                      value={interestForm.email}
+                      onChange={e => setInterestForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="you@example.com"
+                      className="text-xs text-slate-850 dark:text-white bg-white dark:bg-navy"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">Planned Allocation</label>
+                    <select
+                      value={interestForm.amount}
+                      onChange={e => setInterestForm(prev => ({ ...prev, amount: e.target.value }))}
+                      className="w-full h-9 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-slate-700 dark:text-slate-300 text-xs"
+                    >
+                      <option>$10k - $50k</option>
+                      <option>$50k - $250k</option>
+                      <option>$250k - $1M</option>
+                      <option>$1M+</option>
+                    </select>
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-semibold text-slate-500 dark:text-slate-400">Investment Thesis / Questions</label>
+                    <textarea
+                      value={interestForm.message}
+                      onChange={e => setInterestForm(prev => ({ ...prev, message: e.target.value }))}
+                      rows={3}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-[#0F172A] text-slate-700 dark:text-slate-300 text-xs resize-none focus:outline-none"
+                    />
+                  </div>
+
+                  <div className="flex gap-2 justify-end pt-3">
+                    <Button type="button" variant="ghost" disabled={interestSubmitting} onClick={() => setExpressingInterest(false)} className="text-xs">
+                      Back
+                    </Button>
+                    <Button type="submit" disabled={interestSubmitting} className="gradient-growth text-white border-0 text-xs flex items-center gap-1.5">
+                      {interestSubmitting ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        'Submit Expression'
+                      )}
+                    </Button>
+                  </div>
+                </form>
+              )
+            ) : (
+              <>
+                <div className="flex items-start justify-between mb-4">
+                  <div>
+                    <h2 className="text-xl font-bold text-slate-800 dark:text-white">{selected.name}</h2>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Badge className={`text-xs border-0 ${sectorColors[selected.sector] || 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-300'}`}>{selected.sector}</Badge>
+                      <span className="text-xs text-slate-400">{selected.stage} · {selected.country}</span>
+                    </div>
+                  </div>
+                  <button onClick={() => setSelected(null)} className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
+                    <X className="w-4 h-4 text-slate-400" />
+                  </button>
                 </div>
-              ))}
-            </div>
-            <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-3 mb-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Current Round</p>
-                  <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{selected.raising}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{selected.description}</p>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
+                  {[
+                    { label: 'Valuation', value: selected.valuation },
+                    { label: 'MRR', value: selected.mrr },
+                    { label: 'Growth', value: selected.growth, color: 'text-emerald-500' },
+                    { label: 'Team', value: `${selected.team}` },
+                    { label: 'Founded', value: selected.founded.toString() },
+                    { label: 'AI Score', value: `${selected.score}/100`, color: 'text-purple-500' },
+                  ].map((item, i) => (
+                    <div key={i} className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 text-center">
+                      <p className="text-xs text-slate-400 mb-1">{item.label}</p>
+                      <p className={`text-sm font-bold ${(item as any).color || 'text-slate-800 dark:text-white'}`}>{item.value}</p>
+                    </div>
+                  ))}
                 </div>
-                <p className="text-xs text-slate-400">Investors: {selected.investors}</p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              <Button className="flex-1 gradient-growth text-white border-0 text-sm" onClick={() => { toast.success(`Interest submitted for ${selected.name}`); setSelected(null); }}>
-                Express Interest
-              </Button>
-              <Button variant="outline" className="text-sm" onClick={() => { toggleSave(selected.id, selected.name); setSelected(null); }}>
-                {saved.includes(selected.id) ? 'Unsave' : 'Save Deal'}
-              </Button>
-            </div>
+                <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-3 mb-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-emerald-600 dark:text-emerald-400 font-semibold">Current Round</p>
+                      <p className="text-lg font-bold text-emerald-600 dark:text-emerald-400">{selected.raising}</p>
+                    </div>
+                    <p className="text-xs text-slate-400">Investors: {selected.investors}</p>
+                  </div>
+                </div>
+                <div className="flex gap-2">
+                  <Button className="flex-1 gradient-growth text-white border-0 text-sm" onClick={() => setExpressingInterest(true)}>
+                    Express Interest
+                  </Button>
+                  <Button variant="outline" className="text-sm" onClick={() => { toggleSave(selected.id, selected.name); setSelected(null); }}>
+                    {saved.includes(selected.id) ? 'Unsave' : 'Save Deal'}
+                  </Button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
@@ -202,7 +330,7 @@ export default function StartupIntelligence() {
                     <button onClick={() => toggleSave(s.id, s.name)} className={`p-1.5 rounded-lg transition-colors ${saved.includes(s.id) ? 'text-amber-400 bg-amber-50 dark:bg-amber-500/10' : 'text-slate-300 hover:text-amber-400'}`}>
                       <Star className="w-4 h-4" fill={saved.includes(s.id) ? 'currentColor' : 'none'} />
                     </button>
-                    <Button size="sm" className="text-xs gradient-growth text-white border-0 h-8" onClick={() => setSelected(s)}>
+                    <Button size="sm" className="text-xs gradient-growth text-white border-0 h-8" onClick={() => handleOpenDetail(s)}>
                       Deep Dive
                     </Button>
                   </div>

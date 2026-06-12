@@ -1,9 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Menu, X, TrendingUp, Sun, Moon } from 'lucide-react';
+import { Menu, X, TrendingUp, Sun, Moon, ChevronDown, LogOut, User, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { getStoredUser } from '@/lib/auth';
+import { getStoredUser, logout } from '@/lib/auth';
 import { useTheme } from '@/hooks/useTheme';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { toast } from 'sonner';
 
 const navLinks = [
   { label: 'Features', href: '/features' },
@@ -45,6 +54,7 @@ export default function Navbar() {
   const linkColor = isAlwaysDark || theme === 'dark' ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900';
   const iconColor = isAlwaysDark || theme === 'dark' ? 'text-slate-400 hover:text-white' : 'text-slate-500 hover:text-slate-800';
   const signInColor = isAlwaysDark || theme === 'dark' ? 'text-slate-300 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100';
+  const profileBtnColor = isAlwaysDark || theme === 'dark' ? 'text-slate-300 hover:text-white hover:bg-white/10' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100';
   const mobileBg = theme === 'dark' ? 'bg-navy border-t border-white/10' : 'bg-white border-t border-slate-200';
   const mobileLinkColor = theme === 'dark' ? 'text-slate-300 hover:text-white' : 'text-slate-600 hover:text-slate-900';
 
@@ -85,13 +95,55 @@ export default function Navbar() {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
             {user ? (
-              <Button
-                onClick={() => navigate('/dashboard')}
-                size="sm"
-                className="gradient-growth text-white border-0 hover:opacity-90"
-              >
-                Dashboard
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <button className={`flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-lg transition-colors focus:outline-none ${profileBtnColor}`}>
+                    <Avatar className="w-8 h-8">
+                      <AvatarImage src={user.avatar} />
+                      <AvatarFallback className="bg-emerald-500 text-white text-xs font-bold">{user.name.charAt(0)}</AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">
+                      {user.name.split(' ')[0]}
+                    </span>
+                    <ChevronDown className="w-3.5 h-3.5 opacity-70" />
+                  </button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-xl shadow-xl py-1.5 z-50">
+                  <DropdownMenuItem 
+                    onClick={() => navigate('/dashboard')}
+                    className="cursor-pointer px-4 py-2.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors font-medium focus:bg-slate-100 dark:focus:bg-white/5 flex items-center gap-2"
+                  >
+                    <TrendingUp className="w-3.5 h-3.5 text-slate-400" />
+                    Dashboard
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => navigate('/dashboard/profile')}
+                    className="cursor-pointer px-4 py-2.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors font-medium focus:bg-slate-100 dark:focus:bg-white/5 flex items-center gap-2"
+                  >
+                    <User className="w-3.5 h-3.5 text-slate-400" />
+                    My Profile
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
+                    onClick={() => navigate('/dashboard/settings')}
+                    className="cursor-pointer px-4 py-2.5 text-xs text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-white/5 transition-colors font-medium focus:bg-slate-100 dark:focus:bg-white/5 flex items-center gap-2"
+                  >
+                    <Settings className="w-3.5 h-3.5 text-slate-400" />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator className="bg-slate-100 dark:bg-white/5 my-1" />
+                  <DropdownMenuItem 
+                    onClick={() => {
+                      logout();
+                      toast.success('Signed out successfully.');
+                      navigate('/');
+                    }}
+                    className="cursor-pointer px-4 py-2.5 text-xs text-red-650 dark:text-red-450 hover:bg-red-50 dark:hover:bg-red-500/5 transition-colors font-medium focus:bg-red-50 dark:focus:bg-red-500/5 flex items-center gap-2"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-red-500" />
+                    Sign Out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             ) : (
               <>
                 <Button
@@ -144,21 +196,69 @@ export default function Navbar() {
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
               {theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
             </button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => { navigate('/login'); setIsOpen(false); }}
-              className={`w-full justify-start ${mobileLinkColor}`}
-            >
-              Sign In
-            </Button>
-            <Button
-              size="sm"
-              onClick={() => { navigate('/register'); setIsOpen(false); }}
-              className="gradient-growth text-white border-0 w-full"
-            >
-              Start Free Trial
-            </Button>
+            {user ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { navigate('/dashboard'); setIsOpen(false); }}
+                  className={`w-full justify-start ${mobileLinkColor} flex items-center gap-2`}
+                >
+                  <TrendingUp className="w-4 h-4" />
+                  Dashboard
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { navigate('/dashboard/profile'); setIsOpen(false); }}
+                  className={`w-full justify-start ${mobileLinkColor} flex items-center gap-2`}
+                >
+                  <User className="w-4 h-4" />
+                  My Profile
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { navigate('/dashboard/settings'); setIsOpen(false); }}
+                  className={`w-full justify-start ${mobileLinkColor} flex items-center gap-2`}
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    logout();
+                    toast.success('Signed out successfully.');
+                    navigate('/');
+                    setIsOpen(false);
+                  }}
+                  className="w-full justify-start text-red-650 dark:text-red-450 hover:bg-red-50 dark:hover:bg-red-500/10 flex items-center gap-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => { navigate('/login'); setIsOpen(false); }}
+                  className={`w-full justify-start ${mobileLinkColor}`}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  size="sm"
+                  onClick={() => { navigate('/register'); setIsOpen(false); }}
+                  className="gradient-growth text-white border-0 w-full"
+                >
+                  Start Free Trial
+                </Button>
+              </>
+            )}
           </div>
         </div>
       )}

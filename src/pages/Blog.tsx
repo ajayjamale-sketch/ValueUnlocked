@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { Search, Tag, Clock, ArrowRight, TrendingUp, BookOpen } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -17,13 +17,25 @@ const allPosts = [
 ];
 
 export default function Blog() {
-  const [query, setQuery] = useState('');
-  const [activeCategory, setActiveCategory] = useState('All');
   const navigate = useNavigate();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const searchParam = searchParams.get('search') || '';
+
+  const [query, setQuery] = useState(searchParam);
+  const [activeCategory, setActiveCategory] = useState('All');
+
+  useEffect(() => {
+    if (searchParam) {
+      setQuery(searchParam);
+    }
+  }, [searchParam]);
 
   const filtered = allPosts.filter(p =>
     (activeCategory === 'All' || p.category === activeCategory) &&
-    (p.title.toLowerCase().includes(query.toLowerCase()) || p.excerpt.toLowerCase().includes(query.toLowerCase()))
+    (p.title.toLowerCase().includes(query.toLowerCase()) ||
+     p.excerpt.toLowerCase().includes(query.toLowerCase()) ||
+     p.tags.some(t => t.toLowerCase().includes(query.toLowerCase())))
   );
 
   return (

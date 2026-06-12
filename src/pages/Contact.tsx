@@ -66,7 +66,11 @@ export default function Contact() {
               <div className="p-5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl">
                 <h3 className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm mb-2">Enterprise Sales</h3>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Looking for custom solutions for your firm or family office? Our enterprise team will create a tailored plan for you.</p>
-                <Button size="sm" className="gradient-growth text-white border-0 w-full h-8 text-xs" onClick={() => toast.info('Connecting you with Enterprise Sales...')}>
+                <Button size="sm" className="gradient-growth text-white border-0 w-full h-8 text-xs" onClick={() => {
+                  setForm(p => ({ ...p, topic: 'Partnership / Enterprise' }));
+                  toast.info('Selected Partnership / Enterprise topic in the form below');
+                  document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
+                }}>
                   Talk to Enterprise Sales
                 </Button>
               </div>
@@ -86,7 +90,7 @@ export default function Contact() {
                   </Button>
                 </div>
               ) : (
-                <div className="bg-white dark:bg-navy rounded-2xl border border-slate-200 dark:border-white/10 p-8">
+                <div id="contact-form" className="bg-white dark:bg-navy rounded-2xl border border-slate-200 dark:border-white/10 p-8">
                   <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Send Us a Message</h2>
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

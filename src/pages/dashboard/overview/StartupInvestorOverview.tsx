@@ -1,5 +1,5 @@
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
-import { Zap, TrendingUp, DollarSign, Target, Star, Search, ArrowUpRight, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { Zap, TrendingUp, DollarSign, Target, Star, Search, ArrowUpRight, AlertTriangle, X } from 'lucide-react';
 import KPICard from '@/components/features/KPICard';
 import { startupPortfolio } from '@/lib/mockData';
 import { Badge } from '@/components/ui/badge';
@@ -8,10 +8,10 @@ import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
 
 const dealFlow = [
-  { name: 'NexGen AI', stage: 'Series A', sector: 'AI', valuation: '$28M', ask: '$500K', fit: 94, status: 'hot' },
-  { name: 'EcoLoop', stage: 'Seed', sector: 'CleanTech', valuation: '$8M', ask: '$150K', fit: 87, status: 'new' },
-  { name: 'MedAI Platform', stage: 'Series B', sector: 'HealthTech', valuation: '$85M', ask: '$2M', fit: 82, status: 'reviewing' },
-  { name: 'BlockLedger', stage: 'Pre-Seed', sector: 'Web3', valuation: '$4M', ask: '$75K', fit: 71, status: 'new' },
+  { name: 'NexGen AI', stage: 'Series A', sector: 'AI', valuation: '$28M', ask: '$500K', fit: 94, status: 'hot', description: 'Next-generation LLM security and optimization orchestration layer for enterprise software suites.' },
+  { name: 'EcoLoop', stage: 'Seed', sector: 'CleanTech', valuation: '$8M', ask: '$150K', fit: 87, status: 'new', description: 'Decentralized carbon tracking database and micro-offset tokenization platform.' },
+  { name: 'MedAI Platform', stage: 'Series B', sector: 'HealthTech', valuation: '$85M', ask: '$2M', fit: 82, status: 'reviewing', description: 'Predictive health analytics and remote patient monitoring software using proprietary ML models.' },
+  { name: 'BlockLedger', stage: 'Pre-Seed', sector: 'Web3', valuation: '$4M', ask: '$75K', fit: 71, status: 'new', description: 'Sub-second finality smart contract indexing and API query system for multi-chain analytics.' },
 ];
 
 const sectorAlloc = [
@@ -32,6 +32,8 @@ const stageData = [
 
 export default function StartupInvestorOverview() {
   const navigate = useNavigate();
+  const [selectedCompany, setSelectedCompany] = useState<any | null>(null);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -51,7 +53,7 @@ export default function StartupInvestorOverview() {
           </div>
           <div className="space-y-3">
             {startupPortfolio.map(s => (
-              <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer" onClick={() => toast.info(`Opening ${s.name} details...`)}>
+              <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-white/5 hover:bg-slate-100 dark:hover:bg-white/10 transition-colors cursor-pointer" onClick={() => setSelectedCompany({ name: s.name, stage: s.stage, sector: s.sector, ownership: s.ownership, value: s.currentValue, status: s.status })}>
                 <div className="flex items-center gap-3">
                   <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${s.status === 'growing' ? 'bg-emerald-500/20' : s.status === 'at-risk' ? 'bg-red-500/20' : 'bg-slate-200 dark:bg-white/10'}`}>
                     <span className={`text-xs font-bold ${s.status === 'growing' ? 'text-emerald-400' : s.status === 'at-risk' ? 'text-red-400' : 'text-slate-400'}`}>{s.name.slice(0,2)}</span>
@@ -108,7 +110,7 @@ export default function StartupInvestorOverview() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs font-bold text-emerald-500">{d.fit}% fit</p>
-                    <Button variant="ghost" size="sm" className="h-5 text-[10px] p-0 text-slate-400 hover:text-emerald-400" onClick={() => toast.info(`Reviewing ${d.name}...`)}>Review</Button>
+                    <Button variant="ghost" size="sm" className="h-5 text-[10px] p-0 text-slate-400 hover:text-emerald-400" onClick={() => setSelectedCompany(d)}>Review</Button>
                   </div>
                 </div>
               ))}
@@ -148,7 +150,7 @@ export default function StartupInvestorOverview() {
                     <Badge className={`text-[10px] border-0 ${d.status === 'hot' ? 'bg-red-100 dark:bg-red-500/20 text-red-700 dark:text-red-400' : d.status === 'new' ? 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400' : 'bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400'}`}>{d.status}</Badge>
                   </td>
                   <td className="py-3 text-right">
-                    <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-emerald-500 hover:text-emerald-400" onClick={() => toast.success(`Opening ${d.name} deep-dive...`)}>
+                    <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-emerald-500 hover:text-emerald-400" onClick={() => setSelectedCompany(d)}>
                       Deep Dive <ArrowUpRight className="w-3 h-3" />
                     </Button>
                   </td>
@@ -158,6 +160,61 @@ export default function StartupInvestorOverview() {
           </table>
         </div>
       </div>
+
+      {/* Selected Startup Modal */}
+      {selectedCompany && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedCompany(null)}>
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl relative my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4 pb-2 border-b border-slate-100 dark:border-white/10">
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-white text-lg">{selectedCompany.name}</h3>
+                <div className="flex gap-2 mt-1">
+                  <Badge className="text-[10px] bg-blue-100 dark:bg-blue-500/20 text-blue-700 dark:text-blue-400 border-0">{selectedCompany.stage}</Badge>
+                  <span className="text-xs text-slate-400">{selectedCompany.sector}</span>
+                </div>
+              </div>
+              <button onClick={() => setSelectedCompany(null)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <div className="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+              <p className="text-xs">
+                {selectedCompany.description || `This high-growth venture is disrupting the ${selectedCompany.sector} industry. Currently operating at the ${selectedCompany.stage} stage with solid product-market fit and a strong team.`}
+              </p>
+              <div className="grid grid-cols-2 gap-3 text-center">
+                <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl p-3">
+                  <p className="text-xs text-slate-400">{selectedCompany.valuation ? 'Valuation' : 'Ownership'}</p>
+                  <p className="text-sm font-bold text-slate-800 dark:text-white">{selectedCompany.valuation || selectedCompany.ownership}</p>
+                </div>
+                <div className="bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl p-3">
+                  <p className="text-xs text-slate-400">{selectedCompany.ask ? 'Funding Ask' : 'Current Value'}</p>
+                  <p className="text-sm font-bold text-emerald-500">{selectedCompany.ask || (selectedCompany.value ? `$${(selectedCompany.value/1000).toFixed(0)}K` : 'Growing')}</p>
+                </div>
+              </div>
+              {selectedCompany.fit && (
+                <div className="p-3 bg-slate-50 dark:bg-white/5 border border-slate-100 dark:border-white/10 rounded-xl">
+                  <p className="text-xs text-slate-400 mb-1">AI Alignment Fit</p>
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 h-1.5 bg-slate-200 dark:bg-white/10 rounded-full">
+                      <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${selectedCompany.fit}%` }} />
+                    </div>
+                    <span className="text-xs font-bold text-emerald-500">{selectedCompany.fit}% fit</span>
+                  </div>
+                </div>
+              )}
+              <div className="flex gap-2 justify-end pt-2">
+                <Button variant="outline" className="text-xs" onClick={() => setSelectedCompany(null)}>Close</Button>
+                {selectedCompany.ask && (
+                  <Button className="gradient-growth text-white border-0 text-xs" onClick={() => {
+                    toast.success(`Registered interest in ${selectedCompany.name}! A partner will contact you shortly.`);
+                    setSelectedCompany(null);
+                  }}>Express Interest</Button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

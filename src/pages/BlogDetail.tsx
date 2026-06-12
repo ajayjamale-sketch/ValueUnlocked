@@ -79,7 +79,7 @@ export default function BlogDetail() {
         <div className="flex items-center gap-3 flex-wrap mb-10 pb-10 border-b border-slate-200 dark:border-white/10">
           <Tag className="w-4 h-4 text-slate-400" />
           {post.tags.map((tag, i) => (
-            <Badge key={i} variant="secondary" className="text-xs cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-500/20 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" onClick={() => toast.info(`Searching #${tag}...`)}>#{tag}</Badge>
+            <Badge key={i} variant="secondary" className="text-xs cursor-pointer hover:bg-emerald-100 dark:hover:bg-emerald-500/20 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors" onClick={() => navigate(`/blog?search=${tag}`)}>#{tag}</Badge>
           ))}
         </div>
 

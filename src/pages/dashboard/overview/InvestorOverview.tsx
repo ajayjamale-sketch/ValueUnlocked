@@ -1,22 +1,35 @@
+import { useState } from 'react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { Briefcase, DollarSign, TrendingUp, Zap, Brain, Activity } from 'lucide-react';
 import KPICard from '@/components/features/KPICard';
 import OpportunityCard from '@/components/features/OpportunityCard';
-import { portfolioChartData, assetAllocationData, aiInsights, opportunities, portfolioAssets } from '@/lib/mockData';
+import { portfolioChartData, assetAllocationData, aiInsights, opportunities } from '@/lib/mockData';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useDashboard } from '@/context/DashboardContext';
 
 const insightBg: Record<string, string> = { opportunity: 'bg-emerald-50 dark:bg-emerald-500/10 border-emerald-200 dark:border-emerald-500/30', risk: 'bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/30', action: 'bg-amber-50 dark:bg-amber-500/10 border-amber-200 dark:border-amber-500/30', info: 'bg-blue-50 dark:bg-blue-500/10 border-blue-200 dark:border-blue-500/30' };
 const insightText: Record<string, string> = { opportunity: 'text-emerald-600 dark:text-emerald-400', risk: 'text-red-600 dark:text-red-400', action: 'text-amber-600 dark:text-amber-400', info: 'text-blue-600 dark:text-blue-400' };
 
 export default function InvestorOverview() {
   const navigate = useNavigate();
+  const { portfolioAssets } = useDashboard();
+
+  const [timeframe, setTimeframe] = useState('1Y');
+
+  // Dynamic calculations
+  const totalValue = portfolioAssets.reduce((a, s) => a + s.value, 0);
+  const totalGain = portfolioAssets.reduce((a, s) => a + s.gain, 0);
+  const gainPct = totalValue > 0 ? ((totalGain / (totalValue - totalGain)) * 100).toFixed(1) : '0.0';
+  const netWorth = 2847500 - 1245830 + totalValue;
+  const sortedAssets = [...portfolioAssets].sort((a, b) => b.value - a.value);
+
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KPICard label="Portfolio Value" value="$1,245,830" change="+$18,420 today" positive={true} icon={Briefcase} gradient />
-        <KPICard label="Net Worth" value="$2,847,500" change="+1.51% this month" positive={true} icon={DollarSign} iconColor="text-gold-400" />
+        <KPICard label="Portfolio Value" value={`$${totalValue.toLocaleString()}`} change={`${totalGain >= 0 ? '+' : ''}$${totalGain.toLocaleString()} all time`} positive={totalGain >= 0} icon={Briefcase} gradient />
+        <KPICard label="Net Worth" value={`$${netWorth.toLocaleString()}`} change={`${totalGain >= 0 ? '+' : ''}${gainPct}% vs baseline`} positive={totalGain >= 0} icon={DollarSign} iconColor="text-gold-400" />
         <KPICard label="Monthly Returns" value="$18,420" change="+21% vs last month" positive={true} icon={TrendingUp} iconColor="text-emerald-400" />
         <KPICard label="Opportunity Score" value="87 / 100" subtitle="High Conviction" icon={Zap} iconColor="text-purple-400" />
       </div>
@@ -30,7 +43,13 @@ export default function InvestorOverview() {
             </div>
             <div className="flex gap-2">
               {['1M','3M','6M','1Y'].map(p => (
-                <button key={p} className="text-xs px-2 py-1 rounded-md text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10 transition-colors">{p}</button>
+                <button
+                  key={p}
+                  onClick={() => { setTimeframe(p); toast.success(`Chart updated to ${p} timeframe`); }}
+                  className={`text-xs px-2 py-1 rounded-md transition-colors ${timeframe === p ? 'bg-emerald-500/10 text-emerald-500 font-semibold' : 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10'}`}
+                >
+                  {p}
+                </button>
               ))}
             </div>
           </div>
@@ -110,7 +129,7 @@ export default function InvestorOverview() {
             <Button variant="ghost" size="sm" className="text-xs text-emerald-500 h-auto p-0" onClick={() => navigate('/dashboard/portfolio')}>View All</Button>
           </div>
           <div className="space-y-3">
-            {portfolioAssets.map(asset => (
+            {sortedAssets.slice(0, 5).map(asset => (
               <div key={asset.id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 bg-slate-100 dark:bg-white/10 rounded-lg flex items-center justify-center">
@@ -129,6 +148,9 @@ export default function InvestorOverview() {
                 </div>
               </div>
             ))}
+            {sortedAssets.length === 0 && (
+              <p className="text-xs text-slate-400 text-center py-4">No holdings yet.</p>
+            )}
           </div>
         </div>
 

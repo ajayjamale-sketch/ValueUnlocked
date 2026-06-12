@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, Briefcase, Brain, Compass, BookOpen, Users, BarChart3, Zap, Wallet, FileText, Shield, Building2, Check, ArrowRight } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { getStoredUser } from '@/lib/auth';
 
 const modules = [
   {
@@ -68,8 +69,33 @@ const modules = [
   },
 ];
 
+const moduleHrefs: Record<string, string> = {
+  'Investment Research': '/dashboard/research',
+  'Portfolio Management': '/dashboard/portfolio',
+  'Startup Intelligence': '/dashboard/startups',
+  'AI Wealth Advisor': '/dashboard/ai-advisor',
+  'Personal Finance': '/dashboard/finance',
+  'Opportunity Discovery': '/dashboard/opportunities',
+  'Research Marketplace': '/research-marketplace',
+  'Investor Community': '/community',
+  'Learning Academy': '/learning-academy',
+  'Wealth Analytics': '/dashboard/analytics',
+  'Business Intelligence': '/features',
+  'Admin & Compliance': '/dashboard/settings',
+};
+
 export default function Features() {
+  const navigate = useNavigate();
+  const user = getStoredUser();
   const [selected, setSelected] = useState(0);
+
+  const handleTryModule = (title: string) => {
+    if (user) {
+      navigate(moduleHrefs[title] || '/dashboard');
+    } else {
+      navigate('/register');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617]">
@@ -126,11 +152,9 @@ export default function Features() {
                     </div>
                   ))}
                 </div>
-                <Link to="/register">
-                  <Button className="gradient-growth text-white border-0 gap-2">
-                    Try {modules[selected].title} <ArrowRight className="w-4 h-4" />
-                  </Button>
-                </Link>
+                <Button className="gradient-growth text-white border-0 gap-2" onClick={() => handleTryModule(modules[selected].title)}>
+                  Try {modules[selected].title} <ArrowRight className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           </div>

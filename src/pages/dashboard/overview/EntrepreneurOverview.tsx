@@ -53,7 +53,10 @@ export default function EntrepreneurOverview() {
           </div>
 
           <div className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-6">
-            <h3 className="font-semibold text-slate-800 dark:text-white mb-4">Competitive Intelligence</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-slate-800 dark:text-white">Competitive Intelligence</h3>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-emerald-500 hover:text-emerald-400 p-0" onClick={() => navigate('/dashboard/startups')}>Update Competitors</Button>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -88,7 +91,10 @@ export default function EntrepreneurOverview() {
 
         <div className="space-y-4">
           <div className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-5">
-            <h3 className="font-semibold text-slate-800 dark:text-white text-sm mb-4">Business Milestones</h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-slate-800 dark:text-white text-sm">Business Milestones</h3>
+              <Button variant="ghost" size="sm" className="h-7 px-2 text-xs text-emerald-500 hover:text-emerald-400 p-0" onClick={() => navigate('/dashboard/startups')}>Manage</Button>
+            </div>
             <div className="space-y-4">
               {milestones.map((m, i) => (
                 <div key={i}>

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Zap, TrendingUp, Users, DollarSign, Star, X, Globe, Building2, BookmarkPlus, BarChart3, ExternalLink } from 'lucide-react';
+import { Zap, TrendingUp, Users, DollarSign, Star, X, Globe, Building2, BookmarkPlus, BarChart3, ExternalLink, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -160,8 +160,8 @@ export default function StartupPage() {
   return (
     <div className="space-y-6">
       {selected && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setSelected(null)}>
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelected(null)}>
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-xl font-bold text-slate-800 dark:text-white">{selected.name}</h2>
@@ -424,8 +424,8 @@ export default function StartupPage() {
       )}
 
       {showAddInv && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-800 dark:text-white">Add Venture Investment</h2>
               <button onClick={() => setShowAddInv(false)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
@@ -485,8 +485,8 @@ export default function StartupPage() {
       )}
 
       {showUpdateMetrics && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-800 dark:text-white">Update Business Metrics</h2>
               <button onClick={() => setShowUpdateMetrics(false)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
@@ -522,8 +522,8 @@ export default function StartupPage() {
       )}
 
       {deckSlideIdx !== null && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-lg font-bold text-slate-800 dark:text-white">AI-Generated Pitch Deck Preview</h2>
               <button onClick={() => setDeckSlideIdx(null)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
@@ -558,8 +558,8 @@ export default function StartupPage() {
       )}
 
       {showReadiness && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-800 dark:text-white">Fundraising Readiness Assessment</h2>
@@ -615,8 +615,8 @@ export default function StartupPage() {
       )}
 
       {showCoFounders && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-800 dark:text-white">Co-Founder Matchmaking</h2>

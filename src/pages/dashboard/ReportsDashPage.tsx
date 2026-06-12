@@ -232,8 +232,8 @@ export default function ReportsDashPage() {
 
       {/* New Report Modal */}
       {showAdd && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800 dark:text-white">Publish New Research Report</h2>
               <button onClick={() => setShowAdd(false)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
@@ -274,8 +274,8 @@ export default function ReportsDashPage() {
 
       {/* Edit Report Modal */}
       {editingReport && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800 dark:text-white">Edit Research Report</h2>
               <button onClick={() => setEditingReport(null)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
@@ -314,8 +314,8 @@ export default function ReportsDashPage() {
 
       {/* View Report Detail Modal */}
       {viewingReport && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4" onClick={() => setViewingReport(null)}>
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setViewingReport(null)}>
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
                 <Badge className="mb-1 border-0 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400">{viewingReport.category}</Badge>
@@ -349,8 +349,8 @@ export default function ReportsDashPage() {
 
       {/* Confirm Purchase Modal */}
       {purchasingReport && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Confirm Report Purchase</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">You are purchasing: <strong className="text-slate-700 dark:text-slate-300">{purchasingReport.title}</strong></p>
             <div className="bg-slate-50 dark:bg-white/5 p-3 rounded-lg border border-slate-100 dark:border-white/10 mb-5 text-sm space-y-2">

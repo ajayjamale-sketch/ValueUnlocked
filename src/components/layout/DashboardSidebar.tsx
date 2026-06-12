@@ -146,7 +146,9 @@ export default function DashboardSidebar({ collapsed, onToggle, mobileOpen, onMo
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-white/10 h-16">
         {(!collapsed || mobileOpen) && (
-          <span className="text-slate-800 dark:text-white font-bold text-sm">Value<span className="text-emerald-500">Unlocked</span></span>
+          <Link to="/" className="hover:opacity-90 transition-opacity">
+            <span className="text-slate-800 dark:text-white font-bold text-sm">Value<span className="text-emerald-500">Unlocked</span></span>
+          </Link>
         )}
         <button onClick={onToggle} className={`hidden lg:block p-1.5 rounded-lg text-slate-400 hover:text-slate-800 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors ${collapsed ? 'mx-auto' : ''}`}>
           {collapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}

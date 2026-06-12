@@ -9,10 +9,10 @@ import { Button } from '@/components/ui/button';
 
 const categories = [
   { label: 'All Topics', count: faqItems.length },
-  { label: 'AI & Features', count: 3 },
-  { label: 'Security', count: 2 },
-  { label: 'Pricing', count: 2 },
-  { label: 'Integrations', count: 1 },
+  { label: 'AI & Features', count: faqItems.filter(item => (item as any).category === 'AI & Features').length },
+  { label: 'Security', count: faqItems.filter(item => (item as any).category === 'Security').length },
+  { label: 'Pricing', count: faqItems.filter(item => (item as any).category === 'Pricing').length },
+  { label: 'Integrations', count: faqItems.filter(item => (item as any).category === 'Integrations').length },
 ];
 
 export default function FAQ() {
@@ -20,10 +20,12 @@ export default function FAQ() {
   const [query, setQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState('All Topics');
 
-  const filtered = faqItems.filter(item =>
-    item.q.toLowerCase().includes(query.toLowerCase()) ||
-    item.a.toLowerCase().includes(query.toLowerCase())
-  );
+  const filtered = faqItems.filter(item => {
+    const categoryMatch = activeCategory === 'All Topics' || (item as any).category === activeCategory;
+    const queryMatch = item.q.toLowerCase().includes(query.toLowerCase()) ||
+                       item.a.toLowerCase().includes(query.toLowerCase());
+    return categoryMatch && queryMatch;
+  });
 
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617]">

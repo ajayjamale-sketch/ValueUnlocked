@@ -3,12 +3,13 @@ import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { TrendingUp, TrendingDown, Plus, RefreshCw, Download, Filter, X, DollarSign, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { portfolioAssets as initialAssets, portfolioChartData, assetAllocationData } from '@/lib/mockData';
+import { portfolioChartData, assetAllocationData } from '@/lib/mockData';
 import KPICard from '@/components/features/KPICard';
 import { Briefcase, Activity } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import type { PortfolioAsset } from '@/types';
+import { useDashboard } from '@/context/DashboardContext';
 
 const monthlyData = [
   { month: 'Aug', return: 2.1 }, { month: 'Sep', return: 3.4 }, { month: 'Oct', return: -1.2 },
@@ -16,7 +17,7 @@ const monthlyData = [
 ];
 
 export default function PortfolioPage() {
-  const [assets, setAssets] = useState<PortfolioAsset[]>(initialAssets);
+  const { portfolioAssets: assets, addPosition: addPositionCtx, removePosition, executeRebalance: executeRebalanceCtx } = useDashboard();
   const [showAdd, setShowAdd] = useState(false);
   const [activeTab, setActiveTab] = useState<'holdings' | 'performance' | 'allocation'>('holdings');
   const [newPos, setNewPos] = useState({ symbol: '', name: '', type: 'stock', quantity: '', avgPrice: '' });
@@ -25,43 +26,19 @@ export default function PortfolioPage() {
 
   const totalValue = assets.reduce((a, s) => a + s.value, 0);
   const totalGain = assets.reduce((a, s) => a + s.gain, 0);
-  const gainPct = ((totalGain / (totalValue - totalGain)) * 100).toFixed(1);
+  const gainPct = totalValue > 0 ? ((totalGain / (totalValue - totalGain)) * 100).toFixed(1) : '0.0';
 
   const addPosition = () => {
     if (!newPos.symbol || !newPos.quantity || !newPos.avgPrice) return toast.error('Please fill in all fields');
     const qty = parseInt(newPos.quantity);
     const avgPrice = parseFloat(newPos.avgPrice);
-    const currentPrice = avgPrice * (1 + (Math.random() * 0.4 - 0.1)); // simulate price movement
-    const value = qty * currentPrice;
-    const gain = (currentPrice - avgPrice) * qty;
-    const gainPercent = ((currentPrice - avgPrice) / avgPrice) * 100;
-    const totalNewValue = totalValue + value;
-    const newAsset: PortfolioAsset = {
-      id: Date.now().toString(),
-      symbol: newPos.symbol.toUpperCase(),
-      name: newPos.name || newPos.symbol.toUpperCase(),
-      type: newPos.type as any,
-      quantity: qty,
-      avgPrice,
-      currentPrice: parseFloat(currentPrice.toFixed(2)),
-      value: parseFloat(value.toFixed(0)),
-      gain: parseFloat(gain.toFixed(0)),
-      gainPercent: parseFloat(gainPercent.toFixed(1)),
-      allocation: parseFloat(((value / totalNewValue) * 100).toFixed(1)),
-    };
-    // recalculate allocations
-    setAssets(prev => [...prev.map(a => ({ ...a, allocation: parseFloat(((a.value / totalNewValue) * 100).toFixed(1)) })), newAsset]);
+    addPositionCtx(newPos.symbol, newPos.name, newPos.type as any, qty, avgPrice);
     setNewPos({ symbol: '', name: '', type: 'stock', quantity: '', avgPrice: '' });
     setShowAdd(false);
-    toast.success(`${newAsset.symbol} added to portfolio`);
-  };
-
-  const removePosition = (id: string) => {
-    setAssets(prev => prev.filter(a => a.id !== id));
-    toast.success('Position removed from portfolio');
   };
 
   const exportToCSV = () => {
+    if (assets.length === 0) return toast.error('No positions to export.');
     const headers = ['Symbol', 'Name', 'Type', 'Quantity', 'Avg Price', 'Current Price', 'Market Value', 'Gain/Loss', 'Allocation (%)'];
     const rows = assets.map(a => [
       a.symbol,
@@ -87,83 +64,16 @@ export default function PortfolioPage() {
     toast.success('Portfolio exported as CSV successfully!');
   };
 
-  const executeRebalance = () => {
+  const executeRebalance = async () => {
     setRebalancing(true);
-    setTimeout(() => {
-      setAssets(prev => {
-        let trimmedNVDA = false;
-        let trimmedAAPL = false;
-        
-        let newAssets = prev.map(a => {
-          if (a.symbol === 'NVDA') {
-            trimmedNVDA = true;
-            const newQty = Math.max(1, Math.round(a.quantity * 0.8)); // trim by ~20%
-            const newValue = newQty * a.currentPrice;
-            const newGain = (a.currentPrice - a.avgPrice) * newQty;
-            return {
-              ...a,
-              quantity: newQty,
-              value: parseFloat(newValue.toFixed(0)),
-              gain: parseFloat(newGain.toFixed(0)),
-            };
-          }
-          if (a.symbol === 'AAPL') {
-            trimmedAAPL = true;
-            const newQty = Math.max(1, Math.round(a.quantity * 0.9)); // trim by ~10%
-            const newValue = newQty * a.currentPrice;
-            const newGain = (a.currentPrice - a.avgPrice) * newQty;
-            return {
-              ...a,
-              quantity: newQty,
-              value: parseFloat(newValue.toFixed(0)),
-              gain: parseFloat(newGain.toFixed(0)),
-            };
-          }
-          return a;
-        });
-
-        const xlvPrice = 140.00;
-        const xlvInvested = 7000;
-        const xlvQty = Math.round(xlvInvested / xlvPrice);
-        const existingXLV = newAssets.find(a => a.symbol === 'XLV');
-        
-        if (existingXLV) {
-          const newQty = existingXLV.quantity + xlvQty;
-          const newValue = newQty * existingXLV.currentPrice;
-          const newGain = (existingXLV.currentPrice - existingXLV.avgPrice) * newQty;
-          newAssets = newAssets.map(a => a.symbol === 'XLV' ? {
-            ...a,
-            quantity: newQty,
-            value: parseFloat(newValue.toFixed(0)),
-            gain: parseFloat(newGain.toFixed(0)),
-          } : a);
-        } else {
-          newAssets.push({
-            id: 'xlv-rebalance',
-            symbol: 'XLV',
-            name: 'Healthcare Select Sector SPDR',
-            type: 'etf',
-            quantity: xlvQty,
-            avgPrice: xlvPrice,
-            currentPrice: xlvPrice,
-            value: xlvInvested,
-            gain: 0,
-            gainPercent: 0,
-            allocation: 0,
-          });
-        }
-        
-        const totalNewValue = newAssets.reduce((a, s) => a + s.value, 0);
-        return newAssets.map(a => ({
-          ...a,
-          allocation: parseFloat(((a.value / totalNewValue) * 100).toFixed(1))
-        }));
-      });
-      
-      setRebalancing(false);
+    try {
+      await executeRebalanceCtx();
       setShowRebalance(false);
-      toast.success('Portfolio successfully rebalanced: Trimmed Tech, added XLV.');
-    }, 1200);
+    } catch {
+      toast.error('Rebalancing failed.');
+    } finally {
+      setRebalancing(false);
+    }
   };
 
   return (

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MessageSquare, Users, Hash, ThumbsUp, Eye, Bookmark, ArrowRight, TrendingUp, Star, Pin } from 'lucide-react';
+import { MessageSquare, Users, Hash, ThumbsUp, Eye, Bookmark, ArrowRight, TrendingUp, Star, Pin, X } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
@@ -35,7 +35,23 @@ export default function Community() {
   const [bookmarked, setBookmarked] = useState<number[]>([]);
   const [joinedGroups, setJoinedGroups] = useState<string[]>(['Value Investing Club']);
 
-  const filtered = threads.filter(t => activeCategory === 'All' || t.category === activeCategory);
+  const [activeThreads, setActiveThreads] = useState(threads);
+  const [selectedThread, setSelectedThread] = useState<typeof threads[0] | null>(null);
+  const [replyText, setReplyText] = useState('');
+  const [repliesMap, setRepliesMap] = useState<Record<number, Array<{ author: string, avatar: string, time: string, content: string }>>>({
+    1: [
+      { author: 'Sarah W.', avatar: 'SW', time: '1h ago', content: 'Berkshire is a solid long-term compounder. The cash pile gives it massive option value during market downturns.' },
+      { author: 'Alex S.', avatar: 'AS', time: '45m ago', content: 'Agreed, but short-term upside might be limited due to its size. It’s more of a wealth preservation tool now.' }
+    ],
+    2: [
+      { author: 'Marcus C.', avatar: 'MC', time: '3h ago', content: 'Valuation is definitely stretched, but the AI growth trajectory is unprecedented. I would hold but not add new money here.' }
+    ],
+    3: [
+      { author: 'Jen W.', avatar: 'JW', time: '5h ago', content: 'Focus on path to profitability and unit economics. Multiples have compressed significantly.' }
+    ]
+  });
+
+  const filtered = activeThreads.filter(t => activeCategory === 'All' || t.category === activeCategory);
 
   const toggleUpvote = (id: number) => {
     setUpvoted(prev => prev.includes(id) ? prev.filter(u => u !== id) : [...prev, id]);
@@ -49,6 +65,54 @@ export default function Community() {
   const toggleGroup = (name: string) => {
     setJoinedGroups(prev => prev.includes(name) ? prev.filter(g => g !== name) : [...prev, name]);
     toast.success(joinedGroups.includes(name) ? `Left ${name}` : `Joined ${name}!`);
+  };
+
+  const handleCreatePost = () => {
+    if (!newPost.trim()) return;
+    const newThread = {
+      id: activeThreads.length + 1,
+      category: activeCategory === 'All' ? 'Value Investing' : activeCategory,
+      title: newPost,
+      author: 'You',
+      avatar: 'U',
+      replies: 0,
+      views: 1,
+      upvotes: 0,
+      time: 'Just now',
+      pinned: false,
+      color: 'from-emerald-500 to-teal-600',
+    };
+    setActiveThreads([newThread, ...activeThreads]);
+    toast.success('Post published!');
+    setNewPost('');
+  };
+
+  const handleAddReply = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedThread || !replyText.trim()) return;
+
+    const newReply = {
+      author: 'You',
+      avatar: 'U',
+      time: 'Just now',
+      content: replyText.trim()
+    };
+
+    setRepliesMap(prev => ({
+      ...prev,
+      [selectedThread.id]: [...(prev[selectedThread.id] || []), newReply]
+    }));
+
+    // Increment replies count in activeThreads
+    setActiveThreads(prev => prev.map(t => {
+      if (t.id === selectedThread.id) {
+        return { ...t, replies: t.replies + 1 };
+      }
+      return t;
+    }));
+
+    toast.success('Reply submitted!');
+    setReplyText('');
   };
 
   return (
@@ -82,7 +146,7 @@ export default function Community() {
                 <span className="text-white text-sm font-bold">Y</span>
               </div>
               <Input value={newPost} onChange={e => setNewPost(e.target.value)} placeholder="Share an investment idea or start a discussion..." className="flex-1 border-0 bg-slate-50 dark:bg-white/5 focus-visible:ring-0" />
-              <Button size="sm" className="gradient-growth text-white border-0" disabled={!newPost.trim()} onClick={() => { toast.success('Post published!'); setNewPost(''); }}>Post</Button>
+              <Button size="sm" className="gradient-growth text-white border-0" disabled={!newPost.trim()} onClick={handleCreatePost}>Post</Button>
             </div>
 
             {/* Category Filter */}
@@ -105,7 +169,7 @@ export default function Community() {
                         <Badge className="text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-0">#{t.category}</Badge>
                         {t.pinned && <Badge className="text-[10px] bg-amber-100 dark:bg-amber-500/20 text-amber-700 dark:text-amber-400 border-0 flex items-center gap-1"><Pin className="w-2.5 h-2.5" />Pinned</Badge>}
                       </div>
-                      <p className="font-semibold text-slate-800 dark:text-white text-sm leading-snug cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => toast.info(`Opening: ${t.title}`)}>
+                      <p className="font-semibold text-slate-800 dark:text-white text-sm leading-snug cursor-pointer hover:text-emerald-500 transition-colors" onClick={() => setSelectedThread(t)}>
                         {t.title}
                       </p>
                       <div className="flex items-center gap-3 mt-2 text-xs text-slate-400 flex-wrap">
@@ -182,6 +246,73 @@ export default function Community() {
           </div>
         </div>
       </section>
+      {/* Thread Detail Modal */}
+      {selectedThread && (
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedThread(null)}>
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-xl shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150 relative my-8 text-left" onClick={e => e.stopPropagation()}>
+            <div className="flex items-start justify-between mb-4 border-b border-slate-100 dark:border-white/10 pb-4">
+              <div>
+                <Badge className="text-[10px] bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400 border-0 mb-1">#{selectedThread.category}</Badge>
+                <h2 className="text-lg font-bold text-slate-800 dark:text-white leading-snug">{selectedThread.title}</h2>
+                <div className="flex items-center gap-2 mt-2 text-xs text-slate-400">
+                  <span className="font-medium text-slate-700 dark:text-slate-300">Started by {selectedThread.author}</span>
+                  <span>·</span>
+                  <span>{selectedThread.time}</span>
+                </div>
+              </div>
+              <button onClick={() => setSelectedThread(null)} className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+
+            {/* Replies section */}
+            <div className="space-y-4 max-h-[300px] overflow-y-auto mb-6 pr-2">
+              <div className="p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-150 dark:border-white/5">
+                <div className="flex items-center gap-2 mb-1.5">
+                  <span className="text-xs font-bold text-emerald-500">{selectedThread.author}</span>
+                  <span className="text-[10px] text-slate-400">Topic Opener</span>
+                </div>
+                <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                  Let's gather some thoughts and analysis on this topic. What do you think are the core drivers, risk factors, or valuation multiples we should be looking at?
+                </p>
+              </div>
+
+              {(repliesMap[selectedThread.id] || []).length > 0 ? (
+                (repliesMap[selectedThread.id] || []).map((reply, i) => (
+                  <div key={i} className="flex gap-3 items-start pl-4 border-l-2 border-slate-100 dark:border-white/5">
+                    <div className="w-7 h-7 rounded-full bg-slate-100 dark:bg-white/10 flex items-center justify-center flex-shrink-0">
+                      <span className="text-xs font-semibold dark:text-white">{reply.avatar}</span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-xs font-bold text-slate-700 dark:text-white">{reply.author}</span>
+                        <span className="text-[10px] text-slate-400">{reply.time}</span>
+                      </div>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{reply.content}</p>
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-slate-400 text-center py-4">No replies yet. Be the first to answer!</p>
+              )}
+            </div>
+
+            {/* Reply Input Form */}
+            <form onSubmit={handleAddReply} className="border-t border-slate-100 dark:border-white/10 pt-4 flex gap-2">
+              <Input
+                value={replyText}
+                onChange={e => setReplyText(e.target.value)}
+                placeholder="Write a response..."
+                className="flex-1 text-xs"
+                required
+              />
+              <Button type="submit" size="sm" className="gradient-growth text-white border-0 text-xs">
+                Reply
+              </Button>
+            </form>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>

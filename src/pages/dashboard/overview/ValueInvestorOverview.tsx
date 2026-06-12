@@ -92,7 +92,7 @@ export default function ValueInvestorOverview() {
                       </div>
                     </td>
                     <td className="py-3 text-right">
-                      <Button variant="ghost" size="sm" className="h-7 text-xs text-emerald-500 hover:text-emerald-400" onClick={() => toast.success(`Analyzing ${s.symbol}...`)}>Analyze</Button>
+                      <Button variant="ghost" size="sm" className="h-7 text-xs text-emerald-500 hover:text-emerald-400" onClick={() => navigate(`/dashboard/research?symbol=${s.symbol}`)}>Analyze</Button>
                     </td>
                   </tr>
                 ))}
@@ -121,7 +121,7 @@ export default function ValueInvestorOverview() {
                 { symbol: 'JNJ', reason: 'Spin-off discount presents opportunity' },
                 { symbol: 'WMT', reason: 'Market share gains accelerating' },
               ].map((p, i) => (
-                <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 dark:bg-white/5">
+                <div key={i} className="flex items-start gap-3 p-2.5 rounded-lg bg-slate-50 dark:bg-white/5 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition-colors" onClick={() => navigate(`/dashboard/research?symbol=${p.symbol}`)}>
                   <div className="w-7 h-7 bg-emerald-500/20 rounded-lg flex items-center justify-center flex-shrink-0">
                     <span className="text-emerald-400 text-[10px] font-bold">{p.symbol.slice(0,2)}</span>
                   </div>

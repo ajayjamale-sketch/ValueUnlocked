@@ -28,9 +28,11 @@ interface Props {
   opportunity: Opportunity;
   compact?: boolean;
   onAction?: () => void;
+  onBookmark?: () => void;
+  isBookmarked?: boolean;
 }
 
-export default function OpportunityCard({ opportunity, compact = false, onAction }: Props) {
+export default function OpportunityCard({ opportunity, compact = false, onAction, onBookmark, isBookmarked }: Props) {
   const scoreColor = opportunity.score >= 85 ? 'text-emerald-400' : opportunity.score >= 70 ? 'text-amber-400' : 'text-slate-400';
 
   return (
@@ -68,10 +70,10 @@ export default function OpportunityCard({ opportunity, compact = false, onAction
         </div>
         <div className="flex items-center gap-1">
           <button
-            className="p-1.5 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-amber-500/10 transition-colors"
-            onClick={() => toast.success(`${opportunity.title} saved to watchlist!`)}
+            className={`p-1.5 rounded-lg transition-colors ${isBookmarked ? 'text-amber-400 bg-amber-500/10' : 'text-slate-300 hover:text-amber-400 hover:bg-amber-500/10'}`}
+            onClick={(e) => { e.stopPropagation(); onBookmark?.(); }}
           >
-            <Bookmark className="w-3.5 h-3.5" />
+            <Bookmark className="w-3.5 h-3.5" fill={isBookmarked ? 'currentColor' : 'none'} />
           </button>
           <Button
             size="sm"
