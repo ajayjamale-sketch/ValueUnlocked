@@ -12,7 +12,7 @@ import { getStoredUser } from '@/lib/auth';
 
 const extraCourses = [
   { id: '5', title: 'Technical Analysis Masterclass', instructor: 'Price Action & Charts', category: 'Technical', level: 'intermediate' as const, duration: '16h', enrolled: 18200, rating: 4.8, price: 199, image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=225&fit=crop' },
-  { id: '6', title: 'Cryptocurrency Investing: A Measured Approach', instructor: 'Digital Asset Strategy', category: 'Crypto', level: 'beginner' as const, duration: '8h', enrolled: 31400, rating: 4.5, price: 99, image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=225&fit=crop' },
+  { id: '6', title: 'Cryptocurrency Investing', instructor: 'Digital Asset Strategy', category: 'Crypto', level: 'beginner' as const, duration: '8h', enrolled: 31400, rating: 4.5, price: 99, image: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=225&fit=crop' },
   { id: '7', title: 'Real Estate Investing for High Net Worth', instructor: 'REIT & Property Strategy', category: 'Real Estate', level: 'advanced' as const, duration: '22h', enrolled: 6800, rating: 4.9, price: 349, image: 'https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=225&fit=crop' },
   { id: '8', title: 'Tax-Efficient Investing', instructor: 'Tax Strategy for Investors', category: 'Tax', level: 'intermediate' as const, duration: '10h', enrolled: 9200, rating: 4.7, price: 179, image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=225&fit=crop' },
 ];

@@ -204,7 +204,7 @@ export default function CommunityDashPage() {
                 <select
                   value={newThread.category}
                   onChange={e => setNewThread(p => ({ ...p, category: e.target.value }))}
-                  className="w-full text-sm bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-300 focus:outline-none"
+                  className="w-full text-sm bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-lg px-3 py-2 text-slate-700 dark:text-slate-300 focus:outline-none"
                 >
                   {categories.slice(1).map(c => <option key={c}>{c}</option>)}
                 </select>

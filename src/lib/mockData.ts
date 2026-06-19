@@ -210,7 +210,7 @@ export const analystReports = [
 
 export const courses: Course[] = [
   { id: '1', title: 'Value Investing Masterclass', instructor: 'Warren-style Analysis', category: 'Investing', level: 'intermediate', duration: '24h', enrolled: 12450, rating: 4.9, price: 299, image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&h=225&fit=crop', progress: 65 },
-  { id: '2', title: 'Portfolio Construction & Risk Management', instructor: 'Quantitative Methods', category: 'Portfolio', level: 'advanced', duration: '18h', enrolled: 8920, rating: 4.8, price: 249, image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=225&fit=crop', progress: 30 },
+  { id: '2', title: 'Portfolio Construction & Risk ', instructor: 'Quantitative Methods', category: 'Portfolio', level: 'advanced', duration: '18h', enrolled: 8920, rating: 4.8, price: 249, image: 'https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&h=225&fit=crop', progress: 30 },
   { id: '3', title: 'Financial Statement Analysis', instructor: 'CFA Curriculum', category: 'Fundamentals', level: 'beginner', duration: '12h', enrolled: 21300, rating: 4.7, price: 149, image: 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?w=400&h=225&fit=crop' },
   { id: '4', title: 'Startup Valuation & VC Investing', instructor: 'VC Partner Series', category: 'Startup', level: 'advanced', duration: '20h', enrolled: 5670, rating: 4.9, price: 399, image: 'https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=400&h=225&fit=crop' },
 ];

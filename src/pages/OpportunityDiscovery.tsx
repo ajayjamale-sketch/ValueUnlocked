@@ -42,6 +42,7 @@ const simulatedChartData: Record<string, Array<{ month: string, target: number, 
 
 export default function OpportunityDiscovery() {
   const navigate = useNavigate();
+  const user = getStoredUser();
   const [type, setType] = useState('All');
   const [risk, setRisk] = useState('All Risks');
   const [query, setQuery] = useState('');
@@ -240,7 +241,7 @@ export default function OpportunityDiscovery() {
           <div className="mt-12 bg-navy rounded-2xl p-8 text-center">
             <h3 className="text-white font-bold text-xl mb-2">Unlock Full AI Opportunity Discovery</h3>
             <p className="text-slate-300 text-sm mb-5">Get access to 500+ opportunities, real-time AI scoring, and portfolio integration.</p>
-            <Link to="/register"><Button className="gradient-growth text-white border-0 gap-2">Start Free Trial <ArrowRight className="w-4 h-4" /></Button></Link>
+            <Button onClick={() => navigate(user ? '/dashboard' : '/register')} className="gradient-growth text-white border-0 gap-2">Start Free Trial <ArrowRight className="w-4 h-4" /></Button>
           </div>
         </div>
       </section>

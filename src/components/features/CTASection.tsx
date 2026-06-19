@@ -1,9 +1,11 @@
 import { ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { getStoredUser } from '@/lib/auth';
 
 export default function CTASection() {
   const navigate = useNavigate();
+  const user = getStoredUser();
 
   return (
     <section className="py-24 bg-navy overflow-hidden relative">
@@ -28,7 +30,7 @@ export default function CTASection() {
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
           <Button
             size="lg"
-            onClick={() => navigate('/register')}
+            onClick={() => navigate(user ? '/dashboard' : '/register')}
             className="gradient-growth text-white border-0 shadow-glow-emerald hover:opacity-90 text-lg px-10 h-14 group"
           >
             Start Free Trial

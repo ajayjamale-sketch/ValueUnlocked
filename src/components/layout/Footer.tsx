@@ -16,7 +16,7 @@ const footerLinks = {
   ],
   Resources: [
     { label: 'Blog', href: '/blog' },
-    { label: 'Learning Academy', href: '/learning-academy' },
+    // { label: 'Learning Academy', href: '/learning-academy' },
     { label: 'FAQ', href: '/faq' },
     { label: 'Opportunity Discovery', href: '/opportunity-discovery' },
     { label: 'Startup Intelligence', href: '/startup-intelligence' },

@@ -1,10 +1,11 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
+import { getStoredUser } from '@/lib/auth';
 
 const roles = [
   { value: 'investor', label: 'Individual Investor', desc: 'I invest my own money' },
@@ -16,6 +17,15 @@ const roles = [
 ];
 
 export default function Register() {
+  const navigate = useNavigate();
+  const user = getStoredUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name: '', email: '', password: '', role: 'investor' });
   const { handleRegister, loading } = useAuth();

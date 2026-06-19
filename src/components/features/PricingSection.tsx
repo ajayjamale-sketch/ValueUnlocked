@@ -3,10 +3,12 @@ import { CheckCircle2, Zap, Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { pricingPlans } from '@/lib/mockData';
+import { getStoredUser } from '@/lib/auth';
 
 export default function PricingSection() {
   const [annual, setAnnual] = useState(true);
   const navigate = useNavigate();
+  const user = getStoredUser();
 
   return (
     <section className="py-24 bg-white dark:bg-[#020617]">
@@ -69,7 +71,7 @@ export default function PricingSection() {
               </ul>
 
               <Button
-                onClick={() => navigate(plan.id === 'enterprise' ? '/contact' : '/register')}
+                onClick={() => navigate(plan.id === 'enterprise' ? '/contact' : user ? '/pricing' : '/register')}
                 className={`w-full ${plan.highlighted ? 'bg-white text-emerald-600 hover:bg-emerald-50 border-0' : 'gradient-growth text-white border-0 hover:opacity-90'}`}
               >
                 {plan.cta}

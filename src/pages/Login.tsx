@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, Eye, EyeOff, Loader2, ArrowRight, Zap, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/hooks/useAuth';
 import type { User } from '@/types';
 import { toast } from 'sonner';
+import { getStoredUser } from '@/lib/auth';
 
 const demoRoles: { role: User['role']; label: string; desc: string; color: string }[] = [
   { role: 'investor', label: 'Investor', desc: 'Portfolio & wealth tracking', color: 'from-emerald-500 to-teal-600' },
@@ -19,6 +20,15 @@ const demoRoles: { role: User['role']; label: string; desc: string; color: strin
 ];
 
 export default function Login() {
+  const navigate = useNavigate();
+  const user = getStoredUser();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
   const [email, setEmail] = useState('investor@valueunlocked.ai');
   const [password, setPassword] = useState('demo1234');
   const [showPass, setShowPass] = useState(false);

@@ -129,27 +129,46 @@ export default function PortfolioPage() {
         </div>
       )}
 
-      {/* Add Position Form */}
+      {/* Add Position Form Modal */}
       {showAdd && (
-        <div className="bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl p-5">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm">Add New Position</h4>
-            <button onClick={() => setShowAdd(false)} className="p-1 rounded-lg hover:bg-emerald-100 dark:hover:bg-white/10 transition-colors">
-              <X className="w-4 h-4 text-slate-400" />
-            </button>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3">
-            <Input placeholder="Symbol (e.g. TSLA)" value={newPos.symbol} onChange={e => setNewPos(p => ({ ...p, symbol: e.target.value }))} className="h-9 text-sm" />
-            <Input placeholder="Company Name" value={newPos.name} onChange={e => setNewPos(p => ({ ...p, name: e.target.value }))} className="h-9 text-sm" />
-            <select value={newPos.type} onChange={e => setNewPos(p => ({ ...p, type: e.target.value }))} className="h-9 px-3 rounded-lg border border-slate-200 dark:border-white/10 bg-white dark:bg-navy text-slate-700 dark:text-slate-300 text-sm">
-              {['stock', 'etf', 'crypto', 'bond', 'startup'].map(t => <option key={t}>{t}</option>)}
-            </select>
-            <Input placeholder="Quantity" type="number" value={newPos.quantity} onChange={e => setNewPos(p => ({ ...p, quantity: e.target.value }))} className="h-9 text-sm" />
-            <Input placeholder="Avg. Buy Price ($)" type="number" value={newPos.avgPrice} onChange={e => setNewPos(p => ({ ...p, avgPrice: e.target.value }))} className="h-9 text-sm" />
-          </div>
-          <div className="flex gap-2 mt-3">
-            <Button size="sm" className="gradient-growth text-white border-0 h-8 text-xs" onClick={addPosition}>Add to Portfolio</Button>
-            <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setShowAdd(false)}>Cancel</Button>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto">
+          <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-start justify-between mb-4">
+              <h2 className="text-lg font-bold text-slate-800 dark:text-white">Add New Position</h2>
+              <button onClick={() => setShowAdd(false)} className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-white/10">
+                <X className="w-4 h-4 text-slate-400" />
+              </button>
+            </div>
+            <form onSubmit={(e) => { e.preventDefault(); addPosition(); }} className="space-y-3.5">
+              <div>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Symbol</label>
+                <Input placeholder="e.g. TSLA" value={newPos.symbol} onChange={e => setNewPos(p => ({ ...p, symbol: e.target.value.toUpperCase() }))} required />
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Company Name</label>
+                <Input placeholder="e.g. Tesla Inc." value={newPos.name} onChange={e => setNewPos(p => ({ ...p, name: e.target.value }))} required />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Asset Type</label>
+                  <select value={newPos.type} onChange={e => setNewPos(p => ({ ...p, type: e.target.value }))} className="w-full text-xs h-10 bg-white dark:bg-[#0F172A] border border-slate-200 dark:border-white/10 rounded-lg px-2 text-slate-700 dark:text-slate-300">
+                    {['stock', 'etf', 'crypto', 'bond', 'startup'].map(t => <option key={t} value={t}>{t.toUpperCase()}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Quantity</label>
+                  <Input type="number" placeholder="Quantity" value={newPos.quantity} onChange={e => setNewPos(p => ({ ...p, quantity: e.target.value }))} required />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-1.5 block">Avg. Buy Price ($)</label>
+                <Input type="number" step="0.01" placeholder="Price per share" value={newPos.avgPrice} onChange={e => setNewPos(p => ({ ...p, avgPrice: e.target.value }))} required />
+              </div>
+              <div className="flex gap-2 justify-end pt-2">
+                <Button variant="outline" type="button" onClick={() => setShowAdd(false)}>Cancel</Button>
+                <Button className="gradient-growth text-white border-0" type="submit">Add to Portfolio</Button>
+              </div>
+            </form>
           </div>
         </div>
       )}

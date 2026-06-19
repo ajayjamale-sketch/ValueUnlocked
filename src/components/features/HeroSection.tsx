@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Play, TrendingUp, Shield, Zap, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import heroImg from '@/assets/hero-dashboard.jpg';
+import { getStoredUser } from '@/lib/auth';
 
 const stats = [
   { label: 'AUM Tracked', value: '$2.4T', suffix: '' },
@@ -20,6 +21,7 @@ const floatingCards = [
 export default function HeroSection() {
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
+  const user = getStoredUser();
 
   useEffect(() => {
     const timer = setTimeout(() => setVisible(true), 100);
@@ -61,7 +63,7 @@ export default function HeroSection() {
 
             <div className="flex flex-col sm:flex-row gap-4 mb-12">
               <Button
-                onClick={() => navigate('/register')}
+                onClick={() => navigate(user ? '/dashboard' : '/register')}
                 size="lg"
                 className="gradient-growth text-white border-0 shadow-glow-emerald hover:opacity-90 text-base px-8 h-12 group"
               >

@@ -6,6 +6,7 @@ import { blogPosts } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
+import { getStoredUser } from '@/lib/auth';
 
 const allPosts = [
   ...blogPosts,
@@ -27,6 +28,7 @@ const blogContent: Record<string, string[]> = {
 export default function BlogDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const user = getStoredUser();
   const post = allPosts.find(p => p.id === id) || allPosts[0];
   const related = allPosts.filter(p => p.id !== post.id && p.category === post.category).slice(0, 2);
   const content = blogContent[id || 'default'] || blogContent.default;
@@ -87,9 +89,9 @@ export default function BlogDetail() {
         <div className="bg-navy rounded-2xl p-8 mb-10 text-center">
           <h3 className="text-white font-bold text-xl mb-2">Want AI-Powered Investment Research?</h3>
           <p className="text-slate-300 text-sm mb-5">Get institutional-grade analysis, opportunity discovery, and a personal AI wealth advisor — all in one platform.</p>
-          <Link to="/register">
-            <Button className="gradient-growth text-white border-0 gap-2">Start Free Trial <ArrowRight className="w-4 h-4" /></Button>
-          </Link>
+          <Button onClick={() => navigate(user ? '/dashboard' : '/register')} className="gradient-growth text-white border-0 gap-2">
+            Start Free Trial <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
 
         {/* Navigation */}

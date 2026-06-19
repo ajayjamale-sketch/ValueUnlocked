@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Compass, Filter, TrendingUp, Zap, X, AlertTriangle, CheckCircle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import OpportunityCard from '@/components/features/OpportunityCard';
 import { opportunities } from '@/lib/mockData';
 import { toast } from 'sonner';

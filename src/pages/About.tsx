@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { TrendingUp, Shield, Award, Target, BarChart3, Users, Globe, Zap, ChevronRight, Mail, Phone, MapPin, Star } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import { Button } from '@/components/ui/button';
+import { getStoredUser } from '@/lib/auth';
 
 const team = [
   { name: 'Alexandra Sterling', role: 'CEO & Co-Founder', bg: 'from-emerald-500 to-teal-600', bio: 'Former Goldman Sachs MD. 15+ years in wealth management and fintech.' },
@@ -37,6 +38,8 @@ const stats = [
 ];
 
 export default function About() {
+  const navigate = useNavigate();
+  const user = getStoredUser();
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
@@ -53,7 +56,7 @@ export default function About() {
             We believe every investor — from individual savers to family offices — deserves access to the same powerful research tools and AI-driven insights that have historically only been available to the ultra-wealthy.
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
-            <Link to="/register"><Button className="gradient-growth text-white border-0 px-8 py-3 text-lg">Join ValueUnlocked</Button></Link>
+            <Button onClick={() => navigate(user ? '/dashboard' : '/register')} className="gradient-growth text-white border-0 px-8 py-3 text-lg">Join ValueUnlocked</Button>
             <Link to="/contact"><Button variant="outline" className="bg-transparent border-white/25 text-white hover:bg-white/10 hover:text-white px-8 py-3 text-lg">Contact Us</Button></Link>
           </div>
         </div>
@@ -153,9 +156,7 @@ export default function About() {
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="text-3xl font-bold text-white mb-4">Ready to Unlock Your Wealth Potential?</h2>
           <p className="text-slate-300 mb-8">Join 185,000+ investors, advisors, and entrepreneurs who trust ValueUnlocked.</p>
-          <Link to="/register">
-            <Button className="gradient-growth text-white border-0 px-10 py-4 text-lg">Start Free Trial</Button>
-          </Link>
+          <Button onClick={() => navigate(user ? '/dashboard' : '/register')} className="gradient-growth text-white border-0 px-10 py-4 text-lg">Start Free Trial</Button>
         </div>
       </section>
 

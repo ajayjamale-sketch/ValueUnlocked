@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { PieChart, Pie, Cell } from 'recharts';
 
 const dealFlow = [
   { name: 'NexGen AI', stage: 'Series A', sector: 'AI', valuation: '$28M', ask: '$500K', fit: 94, status: 'hot', description: 'Next-generation LLM security and optimization orchestration layer for enterprise software suites.' },
