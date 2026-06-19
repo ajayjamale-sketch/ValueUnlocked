@@ -31,12 +31,20 @@ export default function ResearchPage() {
   const symbolParam = searchParams.get('symbol');
   const [query, setQuery] = useState('');
   const [selectedStock, setSelectedStock] = useState<typeof stocks[0] | null>(null);
+  const [isBuying, setIsBuying] = useState(false);
+  const [buyQty, setBuyQty] = useState('10');
+  const [buyPrice, setBuyPrice] = useState('');
+
+  const handleOpenStock = (stock: typeof stocks[0]) => {
+    setSelectedStock(stock);
+    setIsBuying(false);
+  };
   
   useEffect(() => {
     if (symbolParam) {
       const found = stocks.find(s => s.symbol.toUpperCase() === symbolParam.toUpperCase());
       if (found) {
-        setSelectedStock(found);
+        handleOpenStock(found);
       }
     }
   }, [symbolParam]);
@@ -82,16 +90,20 @@ export default function ResearchPage() {
     }, 1200);
   };
 
-  const handleBuyStock = () => {
+  const confirmBuyStock = () => {
     if (!selectedStock) return;
-    const qtyStr = window.prompt(`Enter quantity of ${selectedStock.symbol} to buy at $${selectedStock.price}:`, "10");
-    if (qtyStr === null) return;
-    const qty = parseInt(qtyStr);
+    const qty = parseInt(buyQty);
+    const prc = parseFloat(buyPrice);
     if (isNaN(qty) || qty <= 0) {
       toast.error('Please enter a valid quantity.');
       return;
     }
-    addPosition(selectedStock.symbol, selectedStock.name, 'stock', qty, selectedStock.price);
+    if (isNaN(prc) || prc <= 0) {
+      toast.error('Please enter a valid price.');
+      return;
+    }
+    addPosition(selectedStock.symbol, selectedStock.name, 'stock', qty, prc);
+    setIsBuying(false);
     setSelectedStock(null);
   };
 
@@ -99,7 +111,7 @@ export default function ResearchPage() {
     <div className="space-y-6">
       {/* Detail Modal */}
       {selectedStock && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedStock(null)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto pt-24 pb-8" onClick={() => setSelectedStock(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-5">
               <div>
@@ -138,14 +150,62 @@ export default function ResearchPage() {
                 <span className="text-sm font-bold text-emerald-500">{selectedStock.score}</span>
               </div>
             </div>
-            <div className="flex gap-2">
-              <Button className="flex-1 gradient-growth text-white border-0" onClick={handleBuyStock}>
-                Add to Portfolio
-              </Button>
-              <Button variant="outline" className="flex-1" onClick={() => { toggleWatchlist(selectedStock.symbol); setSelectedStock(null); }}>
-                {watchlist.includes(selectedStock.symbol) ? 'Remove Watchlist' : 'Add Watchlist'}
-              </Button>
-            </div>
+            {isBuying ? (
+              <div className="p-4 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 text-left space-y-3 mb-4">
+                <p className="text-xs font-semibold text-slate-700 dark:text-slate-350">Confirm Position Addition</p>
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-medium block">Quantity</label>
+                    <Input 
+                      type="number" 
+                      min={1} 
+                      value={buyQty} 
+                      onChange={e => setBuyQty(e.target.value)} 
+                      className="h-9 text-xs"
+                    />
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] text-slate-400 font-medium block">Price ($)</label>
+                    <Input 
+                      type="number" 
+                      value={buyPrice} 
+                      onChange={e => setBuyPrice(e.target.value)} 
+                      className="h-9 text-xs"
+                    />
+                  </div>
+                </div>
+                <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-300">
+                  <span>Total Value:</span>
+                  <span>${(parseInt(buyQty || '0') * parseFloat(buyPrice || '0')).toLocaleString()}</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    className="flex-1 gradient-growth text-white border-0 text-xs h-8"
+                    onClick={confirmBuyStock}
+                  >
+                    Confirm Add
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    className="flex-1 text-xs h-8"
+                    onClick={() => setIsBuying(false)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-2">
+                <Button className="flex-1 gradient-growth text-white border-0" onClick={() => { setIsBuying(true); setBuyQty('10'); setBuyPrice(selectedStock.price.toString()); }}>
+                  Add to Portfolio
+                </Button>
+                <Button variant="outline" className="flex-1" onClick={() => { toggleWatchlist(selectedStock.symbol); setSelectedStock(null); }}>
+                  {watchlist.includes(selectedStock.symbol) ? 'Remove Watchlist' : 'Add Watchlist'}
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -291,7 +351,7 @@ export default function ResearchPage() {
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                 {filtered.map(s => (
-                  <tr key={s.symbol} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => setSelectedStock(s)}>
+                  <tr key={s.symbol} className="hover:bg-slate-50 dark:hover:bg-white/5 transition-colors cursor-pointer" onClick={() => handleOpenStock(s)}>
                     <td className="px-4 py-3">
                       <div className="w-8 h-8 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg flex items-center justify-center">
                         <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">{s.symbol.slice(0,2)}</span>
@@ -371,7 +431,7 @@ export default function ResearchPage() {
                     </div>
                     <Badge className={`text-[10px] border-0 ${ratingColors[s.rating]}`}>{s.rating}</Badge>
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => setSelectedStock(s)}><Eye className="w-3 h-3 mr-1" />Analyze</Button>
+                      <Button size="sm" variant="outline" className="h-8 text-xs" onClick={() => handleOpenStock(s)}><Eye className="w-3 h-3 mr-1" />Analyze</Button>
                       <button onClick={() => toggleWatchlist(s.symbol)} className="p-1.5 rounded-lg text-amber-400 hover:text-slate-400 transition-colors">
                         <Star className="w-4 h-4" fill="currentColor" />
                       </button>

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { Mail, Phone, MapPin, Send, MessageSquare, Building2, Clock, CheckCircle2 } from 'lucide-react';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -18,6 +18,7 @@ const topics = ['General Inquiry', 'Technical Support', 'Billing & Pricing', 'Pa
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', company: '', topic: 'General Inquiry', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +30,52 @@ export default function Contact() {
     toast.success('Message sent! We will get back to you within 4 hours.');
   };
 
+  const handleEnterpriseClick = () => {
+    // Pre-fill topic and message
+    setForm(p => ({
+      ...p,
+      topic: 'Partnership / Enterprise',
+      message: p.message || 'Hi, I would like to inquire about ValueUnlocked Enterprise solutions for my organization.'
+    }));
+
+    // If name and email are already filled, submit the form directly
+    if (form.name && form.email) {
+      // Use a small delay to allow state update to propagate, then submit
+      setTimeout(() => {
+        formRef.current?.requestSubmit();
+      }, 50);
+    } else {
+      // Otherwise notify and scroll to the form
+      toast.info('Please fill in your name and email, then we\'ll send your enterprise inquiry.');
+      const el = document.getElementById('contact-form');
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+        el.classList.add('ring-2', 'ring-emerald-500', 'transition-all', 'duration-500');
+        setTimeout(() => {
+          el.classList.remove('ring-2', 'ring-emerald-500');
+        }, 2000);
+      }
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-navy py-16 px-4">
-        <div className="max-w-3xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Get in <span className="text-emerald-400">Touch</span></h1>
-          <p className="text-slate-300 text-lg">We would love to hear from you. Our team is available to help you with any question.</p>
+      <section className="bg-navy pt-28 pb-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-navy via-[#0f2d1f] to-navy opacity-80" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25" />
+        <div className="relative max-w-3xl mx-auto text-center">
+          <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-500/30 mb-6 animate-pulse-slow">
+            Contact Support & Sales
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+            Get in <span className="text-gradient-emerald">Touch</span>
+          </h1>
+          <p className="text-slate-300 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+            We would love to hear from you. Our team is available to help you with any question, feedback, or custom enterprise requirements.
+          </p>
         </div>
       </section>
 
@@ -63,18 +101,14 @@ export default function Contact() {
                 );
               })}
 
-              <div className="p-5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/30 rounded-xl">
-                <h3 className="font-semibold text-emerald-700 dark:text-emerald-400 text-sm mb-2">Enterprise Sales</h3>
-                <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">Looking for custom solutions for your firm or family office? Our enterprise team will create a tailored plan for you.</p>
-                <Button size="sm" className="gradient-growth text-white border-0 w-full h-8 text-xs" onClick={() => {
-                  setForm(p => ({ ...p, topic: 'Partnership / Enterprise' }));
-                  toast.info('Selected Partnership / Enterprise topic in the form below');
-                  document.getElementById('contact-form')?.scrollIntoView({ behavior: 'smooth' });
-                }}>
+                <Button 
+                  size="sm" 
+                  className="gradient-growth text-white border-0 w-full h-8 text-xs font-semibold"
+                  onClick={handleEnterpriseClick}
+                >
                   Talk to Enterprise Sales
                 </Button>
               </div>
-            </div>
 
             {/* Contact Form */}
             <div className="lg:col-span-2">
@@ -92,7 +126,7 @@ export default function Contact() {
               ) : (
                 <div id="contact-form" className="bg-white dark:bg-navy rounded-2xl border border-slate-200 dark:border-white/10 p-8">
                   <h2 className="text-xl font-bold text-slate-800 dark:text-white mb-6">Send Us a Message</h2>
-                  <form onSubmit={handleSubmit} className="space-y-5">
+                  <form ref={formRef} onSubmit={handleSubmit} className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Full Name *</label>

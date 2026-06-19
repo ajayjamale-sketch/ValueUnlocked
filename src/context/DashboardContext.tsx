@@ -72,6 +72,7 @@ interface DashboardContextType {
   toggleJoinGroup: (groupName: string) => void;
   enrollInCourse: (courseId: string) => void;
   updateCourseProgress: (courseId: string, increment: number) => void;
+  upvoteThread: (threadId: number) => void;
 }
 
 const DashboardContext = createContext<DashboardContextType | undefined>(undefined);
@@ -455,6 +456,16 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }));
   };
 
+  const upvoteThread = (threadId: number) => {
+    setThreads(prev => prev.map(t => {
+      if (t.id === threadId) {
+        toast.success(`Upvoted discussion: ${t.title}`);
+        return { ...t, upvotes: t.upvotes + 1 };
+      }
+      return t;
+    }));
+  };
+
   return (
     <DashboardContext.Provider value={{
       portfolioAssets,
@@ -478,7 +489,8 @@ export const DashboardProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       addComment,
       toggleJoinGroup,
       enrollInCourse,
-      updateCourseProgress
+      updateCourseProgress,
+      upvoteThread
     }}>
       {children}
     </DashboardContext.Provider>

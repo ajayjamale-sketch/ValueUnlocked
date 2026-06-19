@@ -23,6 +23,7 @@ const presetAvatars = [
 
 export default function ProfilePage() {
   const user = getStoredUser()!;
+  const [avatar, setAvatar] = useState(user.avatar || '');
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState({ name: user.name, email: user.email });
   const [avatarModalOpen, setAvatarModalOpen] = useState(false);
@@ -70,14 +71,14 @@ export default function ProfilePage() {
         <div className="flex items-start gap-6">
           <div className="relative">
             <img
-              src={user.avatar || `https://ui-avatars.com/api/?name=${user.name}&background=10B981&color=fff`}
+              src={avatar || `https://ui-avatars.com/api/?name=${user.name}&background=10B981&color=fff`}
               alt={user.name}
               className="w-20 h-20 rounded-2xl object-cover ring-4 ring-emerald-500/20"
             />
             <button
               onClick={() => {
-                setTempAvatar(user.avatar || '');
-                setCustomAvatarUrl(presetAvatars.includes(user.avatar || '') ? '' : (user.avatar || ''));
+                setTempAvatar(avatar || '');
+                setCustomAvatarUrl(presetAvatars.includes(avatar || '') ? '' : (avatar || ''));
                 setAvatarModalOpen(true);
               }}
               className="absolute -bottom-2 -right-2 p-1.5 bg-emerald-500 rounded-lg text-white hover:bg-emerald-600 transition-colors"
@@ -284,7 +285,7 @@ export default function ProfilePage() {
 
       {/* Avatar Selector Modal */}
       {avatarModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in fade-in zoom-in-95 duration-150">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10">
@@ -380,14 +381,12 @@ export default function ProfilePage() {
               <Button
                 onClick={() => {
                   if (!tempAvatar.trim()) {
-                    return toast.error('Please select an avatar or enter a valid URL.');
+                     return toast.error('Please select an avatar or enter a valid URL.');
                   }
                   storeUser({ ...user, avatar: tempAvatar });
+                  setAvatar(tempAvatar);
                   toast.success('Avatar updated successfully!');
                   setAvatarModalOpen(false);
-                  setTimeout(() => {
-                    window.location.reload();
-                  }, 500);
                 }}
                 className="gradient-growth text-white border-0"
               >

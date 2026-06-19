@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { getStoredUser } from '@/lib/auth';
 
 const allStartups = [
@@ -35,6 +35,7 @@ const sectorColors: Record<string, string> = {
 };
 
 export default function StartupIntelligence() {
+  const navigate = useNavigate();
   const [query, setQuery] = useState('');
   const [sector, setSector] = useState('All');
   const [stage, setStage] = useState('All Stages');
@@ -50,13 +51,18 @@ export default function StartupIntelligence() {
 
   const handleOpenDetail = (startup: typeof allStartups[0]) => {
     const user = getStoredUser();
+    if (!user) {
+      toast.info('Please sign in to view deep dive details.');
+      navigate('/login');
+      return;
+    }
     setSelected(startup);
     setExpressingInterest(false);
     setInterestSubmitted(false);
     setInterestSubmitting(false);
     setInterestForm({
-      name: user?.name || '',
-      email: user?.email || '',
+      name: user.name || '',
+      email: user.email || '',
       amount: '$50k - $250k',
       message: `I am interested in learning more about ${startup.name}’s ${startup.stage} round.`
     });
@@ -89,6 +95,12 @@ export default function StartupIntelligence() {
     });
 
   const toggleSave = (id: string, name: string) => {
+    const user = getStoredUser();
+    if (!user) {
+      toast.info('Please sign in to save deals to your pipeline.');
+      navigate('/login');
+      return;
+    }
     setSaved(prev => prev.includes(id) ? prev.filter(s => s !== id) : [...prev, id]);
     toast.success(saved.includes(id) ? `Removed ${name} from saved` : `${name} saved to pipeline`);
   };
@@ -212,7 +224,7 @@ export default function StartupIntelligence() {
                     { label: 'Growth', value: selected.growth, color: 'text-emerald-500' },
                     { label: 'Team', value: `${selected.team}` },
                     { label: 'Founded', value: selected.founded.toString() },
-                    { label: 'AI Score', value: `${selected.score}/100`, color: 'text-purple-500' },
+                    { label: 'AI Score', value: `${selected.score}/100`, color: 'text-emerald-500' },
                   ].map((item, i) => (
                     <div key={i} className="bg-slate-50 dark:bg-white/5 rounded-xl p-3 text-center">
                       <p className="text-xs text-slate-400 mb-1">{item.label}</p>
@@ -243,15 +255,17 @@ export default function StartupIntelligence() {
         </div>
       )}
 
-      <section className="bg-navy py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <span className="inline-block bg-purple-500/20 text-purple-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-purple-500/30 mb-5">Startup Intelligence</span>
-          <h1 className="text-4xl font-bold text-white mb-4">Discover the Next <span className="text-purple-400">Unicorn</span></h1>
+      <section className="bg-navy pt-28 pb-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-navy via-[#0f2d1f] to-navy opacity-80" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25" />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-500/30 mb-5 animate-pulse-slow">Startup Intelligence</span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">Discover the Next <span className="text-gradient-emerald">Unicorn</span></h1>
           <p className="text-slate-300 text-lg mb-8">AI-powered startup discovery and evaluation platform. Access 10,000+ vetted startups with investment readiness scores.</p>
           <div className="grid grid-cols-3 gap-6 max-w-md mx-auto">
             {[{ v: '10,000+', l: 'Startups Tracked' }, { v: '$2.4B', l: 'Deals Facilitated' }, { v: '68%', l: 'Success Rate' }].map((s, i) => (
               <div key={i} className="text-center">
-                <p className="text-2xl font-bold text-purple-400">{s.v}</p>
+                <p className="text-2xl font-bold text-emerald-400">{s.v}</p>
                 <p className="text-slate-400 text-xs">{s.l}</p>
               </div>
             ))}
@@ -292,12 +306,12 @@ export default function StartupIntelligence() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
             {filtered.map(s => (
-              <div key={s.id} className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-6 hover:border-purple-500/30 hover:shadow-lg transition-all">
+              <div key={s.id} className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-6 hover:border-emerald-500/30 hover:shadow-lg transition-all">
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <h3 className="font-bold text-slate-800 dark:text-white">{s.name}</h3>
-                      <Badge className={`text-xs border-0 bg-purple-100 dark:bg-purple-500/20 text-purple-700 dark:text-purple-400`}>{s.stage}</Badge>
+                      <Badge className={`text-xs border-0 bg-emerald-100 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-400`}>{s.stage}</Badge>
                     </div>
                     <div className="flex items-center gap-2">
                       <Badge className={`text-xs border-0 ${sectorColors[s.sector] || 'bg-slate-100 dark:bg-white/10 text-slate-500'}`}>{s.sector}</Badge>
@@ -305,7 +319,7 @@ export default function StartupIntelligence() {
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0">
-                    <p className="text-2xl font-bold text-purple-500">{s.score}</p>
+                    <p className="text-2xl font-bold text-emerald-500">{s.score}</p>
                     <p className="text-xs text-slate-400">AI Score</p>
                   </div>
                 </div>

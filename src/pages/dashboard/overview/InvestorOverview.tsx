@@ -14,7 +14,7 @@ const insightText: Record<string, string> = { opportunity: 'text-emerald-600 dar
 
 export default function InvestorOverview() {
   const navigate = useNavigate();
-  const { portfolioAssets } = useDashboard();
+  const { portfolioAssets, watchlist, toggleWatchlist } = useDashboard();
 
   const [timeframe, setTimeframe] = useState('1Y');
 
@@ -38,40 +38,33 @@ export default function InvestorOverview() {
         <div className="xl:col-span-2 bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-6">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h3 className="font-semibold text-slate-800 dark:text-white">Portfolio Performance</h3>
-              <p className="text-sm text-slate-400 mt-0.5">vs S&P 500 Benchmark</p>
+              <h3 className="font-semibold text-slate-800 dark:text-white">Portfolio Value</h3>
+              <p className="text-xs text-slate-400 mt-1">Growth & income projection</p>
             </div>
-            <div className="flex gap-2">
-              {['1M','3M','6M','1Y'].map(p => (
-                <button
-                  key={p}
-                  onClick={() => { setTimeframe(p); toast.success(`Chart updated to ${p} timeframe`); }}
-                  className={`text-xs px-2 py-1 rounded-md transition-colors ${timeframe === p ? 'bg-emerald-500/10 text-emerald-500 font-semibold' : 'text-slate-400 hover:text-emerald-400 hover:bg-emerald-500/10'}`}
-                >
-                  {p}
-                </button>
+            <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-lg">
+              {['1M', '3M', '6M', '1Y', 'All'].map(t => (
+                <button key={t} onClick={() => setTimeframe(t)} className={`px-3 py-1 rounded-md text-xs font-medium transition-all ${timeframe === t ? 'bg-white dark:bg-navy text-slate-800 dark:text-white shadow-sm' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-350'}`}>{t}</button>
               ))}
             </div>
           </div>
           <ResponsiveContainer width="100%" height={220}>
             <AreaChart data={portfolioChartData}>
               <defs>
-                <linearGradient id="pf" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.2}/><stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                <linearGradient id="inv1" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10B981" stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(0,0,0,0.05)" className="dark:stroke-white/5" />
               <XAxis dataKey="date" tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} />
               <YAxis tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickFormatter={v => `$${(v/1000).toFixed(0)}K`} />
-              <Tooltip formatter={(v: number) => [`$${v.toLocaleString()}`, '']} contentStyle={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', fontSize: '12px' }} />
-              <Area type="monotone" dataKey="benchmark" stroke="#F59E0B" strokeWidth={1.5} fill="none" strokeDasharray="4 4" dot={false} />
-              <Area type="monotone" dataKey="value" stroke="#10B981" strokeWidth={2} fill="url(#pf)" dot={false} />
+              <Tooltip contentStyle={{ background: '#0F172A', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px', color: '#fff', fontSize: '12px' }} />
+              <Area type="monotone" dataKey="value" stroke="#10B981" strokeWidth={2.5} fill="url(#inv1)" dot={false} />
             </AreaChart>
           </ResponsiveContainer>
         </div>
-
-        <div className="space-y-4">
-          <div className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-6">
+        <div className="bg-white dark:bg-navy rounded-xl border border-slate-200 dark:border-white/10 p-6 flex flex-col justify-between">
+          <div>
             <h3 className="font-semibold text-slate-800 dark:text-white mb-4">Asset Allocation</h3>
             <div className="flex items-center gap-4">
               <PieChart width={90} height={90}>
@@ -156,7 +149,14 @@ export default function InvestorOverview() {
 
         <div className="space-y-4">
           {opportunities.slice(0, 2).map(opp => (
-            <OpportunityCard key={opp.id} opportunity={opp} compact />
+            <OpportunityCard 
+              key={opp.id} 
+              opportunity={opp} 
+              compact 
+              onAction={() => navigate('/dashboard/opportunities', { state: { openOppId: opp.id } })}
+              onBookmark={() => toggleWatchlist(opp.title)}
+              isBookmarked={watchlist?.includes(opp.title)}
+            />
           ))}
           <Button className="w-full gradient-growth text-white border-0 text-sm" onClick={() => navigate('/dashboard/opportunities')}>
             Explore All Opportunities

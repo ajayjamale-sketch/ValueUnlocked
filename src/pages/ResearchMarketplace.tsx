@@ -153,7 +153,7 @@ For information purposes only. © 2026 ValueUnlocked Inc.`;
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
 
-      <section className="bg-navy py-20 px-4">
+      <section className="bg-navy pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-500/30 mb-5">Research Marketplace</span>
           <h1 className="text-4xl font-bold text-white mb-4">Premium Investment <span className="text-emerald-400">Research</span></h1>

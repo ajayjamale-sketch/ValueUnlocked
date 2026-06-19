@@ -163,7 +163,7 @@ export default function StartupInvestorOverview() {
 
       {/* Selected Startup Modal */}
       {selectedCompany && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedCompany(null)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto" onClick={() => setSelectedCompany(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-md shadow-2xl relative my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4 pb-2 border-b border-slate-100 dark:border-white/10">
               <div>

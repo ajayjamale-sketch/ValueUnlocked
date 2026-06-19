@@ -31,7 +31,7 @@ export default function FAQ() {
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
 
-      <section className="bg-navy py-20 px-4">
+      <section className="bg-navy pt-28 pb-20 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h1 className="text-4xl font-bold text-white mb-4">Frequently Asked <span className="text-emerald-400">Questions</span></h1>
           <p className="text-slate-300 mb-8">Everything you need to know about ValueUnlocked.</p>

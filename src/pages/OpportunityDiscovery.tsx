@@ -247,7 +247,7 @@ export default function OpportunityDiscovery() {
 
       {/* AI Opportunity Analysis Modal */}
       {selectedOpp && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedOpp(null)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto" onClick={() => setSelectedOpp(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150 relative my-8 text-left" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-start justify-between mb-4 border-b border-slate-100 dark:border-white/10 pb-4">

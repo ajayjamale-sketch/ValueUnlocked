@@ -232,7 +232,7 @@ export default function ReportsDashPage() {
 
       {/* New Report Modal */}
       {showAdd && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto">
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800 dark:text-white">Publish New Research Report</h2>
@@ -274,7 +274,7 @@ export default function ReportsDashPage() {
 
       {/* Edit Report Modal */}
       {editingReport && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto">
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <div className="flex items-start justify-between mb-4">
               <h2 className="text-xl font-bold text-slate-800 dark:text-white">Edit Research Report</h2>
@@ -314,7 +314,7 @@ export default function ReportsDashPage() {
 
       {/* View Report Detail Modal */}
       {viewingReport && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setViewingReport(null)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto" onClick={() => setViewingReport(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4">
               <div>
@@ -349,7 +349,7 @@ export default function ReportsDashPage() {
 
       {/* Confirm Purchase Modal */}
       {purchasingReport && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto">
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-sm shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150">
             <h2 className="text-lg font-bold text-slate-800 dark:text-white mb-2">Confirm Report Purchase</h2>
             <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">You are purchasing: <strong className="text-slate-700 dark:text-slate-300">{purchasingReport.title}</strong></p>

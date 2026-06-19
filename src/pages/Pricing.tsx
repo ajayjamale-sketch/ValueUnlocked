@@ -124,7 +124,7 @@ export default function Pricing() {
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
 
-      <section className="bg-navy py-20 px-4">
+      <section className="bg-navy pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-5">Simple, Transparent <span className="text-emerald-400">Pricing</span></h1>
           <p className="text-xl text-slate-300 mb-8">Start with a 14-day free trial. No credit card required.</p>

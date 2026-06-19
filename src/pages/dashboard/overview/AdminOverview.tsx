@@ -372,7 +372,7 @@ export default function AdminOverview() {
 
       {/* MODAL: Manage Users */}
       {manageUsersOpen && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-3xl overflow-hidden shadow-xl my-auto animate-in fade-in zoom-in-95 duration-150 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
@@ -543,7 +543,7 @@ export default function AdminOverview() {
 
       {/* MODAL: Review Reports */}
       {reviewReportsOpen && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-2xl overflow-hidden shadow-xl animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
@@ -650,7 +650,7 @@ export default function AdminOverview() {
 
       {/* MODAL: Compliance Log */}
       {complianceLogOpen && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-xl overflow-hidden shadow-xl my-auto animate-in fade-in zoom-in-95 duration-150 animate-in fade-in zoom-in-95 duration-150 flex flex-col max-h-[85vh]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">
@@ -701,7 +701,7 @@ export default function AdminOverview() {
 
       {/* MODAL: System Settings */}
       {systemSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 overflow-y-auto bg-slate-900/60 backdrop-blur-sm overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto bg-slate-900/60 backdrop-blur-sm">
           <div className="bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-2xl w-full max-w-md overflow-hidden shadow-xl animate-in fade-in zoom-in-95 duration-150 flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 dark:border-white/10 flex-shrink-0">

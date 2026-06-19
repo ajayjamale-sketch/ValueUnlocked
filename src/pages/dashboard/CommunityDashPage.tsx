@@ -17,7 +17,8 @@ export default function CommunityDashPage() {
     addThread,
     addComment,
     toggleJoinGroup,
-    toggleWatchlist
+    toggleWatchlist,
+    upvoteThread
   } = useDashboard();
 
   const [activeCategory, setActiveCategory] = useState('All');
@@ -119,8 +120,20 @@ export default function CommunityDashPage() {
                         <span>{t.author}</span>
                         <span>·</span>
                         <span>{t.time}</span>
-                        <span className="flex items-center gap-1"><ThumbsUp className="w-3 h-3" />{t.upvotes}</span>
-                        <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{repliesCount}</span>
+                        <button
+                          className="flex items-center gap-1 hover:text-emerald-500 transition-colors"
+                          onClick={e => { e.stopPropagation(); upvoteThread(t.id); }}
+                        >
+                          <ThumbsUp className="w-3 h-3" />
+                          {t.upvotes}
+                        </button>
+                        <button
+                          className="flex items-center gap-1 hover:text-emerald-500 transition-colors"
+                          onClick={e => { e.stopPropagation(); setSelectedThreadId(t.id); }}
+                        >
+                          <MessageSquare className="w-3 h-3" />
+                          {repliesCount}
+                        </button>
                         <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t.views.toLocaleString()}</span>
                       </div>
                     </div>
@@ -177,7 +190,7 @@ export default function CommunityDashPage() {
 
       {/* Create Thread Modal */}
       {showCreateModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setShowCreateModal(false)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto" onClick={() => setShowCreateModal(false)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-lg shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-slate-100 dark:border-white/10">
               <h3 className="font-bold text-slate-800 dark:text-white text-lg">Create New Discussion</h3>
@@ -226,7 +239,7 @@ export default function CommunityDashPage() {
 
       {/* Thread Detail Modal */}
       {selectedThread && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedThreadId(null)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto" onClick={() => setSelectedThreadId(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150 relative my-8" onClick={e => e.stopPropagation()}>
             <div className="flex items-start justify-between mb-4 border-b border-slate-100 dark:border-white/10 pb-4">
               <div>

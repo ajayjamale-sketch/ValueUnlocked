@@ -54,7 +54,7 @@ export default function About() {
           </p>
           <div className="flex items-center justify-center gap-4 flex-wrap">
             <Link to="/register"><Button className="gradient-growth text-white border-0 px-8 py-3 text-lg">Join ValueUnlocked</Button></Link>
-            <Link to="/contact"><Button variant="outline" className="border-white/20 text-white hover:bg-white/10 px-8 py-3 text-lg">Contact Us</Button></Link>
+            <Link to="/contact"><Button variant="outline" className="bg-transparent border-white/25 text-white hover:bg-white/10 hover:text-white px-8 py-3 text-lg">Contact Us</Button></Link>
           </div>
         </div>
       </section>

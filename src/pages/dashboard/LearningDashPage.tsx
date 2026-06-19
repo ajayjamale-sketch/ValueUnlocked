@@ -44,18 +44,8 @@ export default function LearningDashPage() {
     const course = courses.find(c => c.id === courseId);
     if (!course) return;
     
-    if (course.progress === undefined) {
-      // If not enrolled, show details first and confirm enrollment
-      const confirmEnroll = window.confirm(`Would you like to enroll in "${course.title}" for $${course.price}?`);
-      if (confirmEnroll) {
-        enrollInCourse(courseId);
-        setSelectedCourseId(courseId);
-        setIsPlaying(true);
-      }
-    } else {
-      setSelectedCourseId(courseId);
-      setIsPlaying(true);
-    }
+    setSelectedCourseId(courseId);
+    setIsPlaying(true);
   };
 
   const handleCompleteLesson = () => {
@@ -207,7 +197,7 @@ export default function LearningDashPage() {
 
       {/* Course Classroom Drawer/Modal */}
       {selectedCourse && (
-        <div className="fixed inset-0 z-50 bg-black/70 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedCourseId(null)}>
+        <div className="fixed inset-0 z-50 bg-black/70 flex items-start sm:items-center justify-center p-4 pt-24 pb-8 overflow-y-auto" onClick={() => setSelectedCourseId(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-4xl shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150 relative my-8" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4 border-b border-slate-100 dark:border-white/10 pb-4">
               <div>
@@ -223,43 +213,69 @@ export default function LearningDashPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column: Video & Transcript */}
               <div className="lg:col-span-2 space-y-4">
-                {/* Simulated Video Player */}
-                <div className="relative aspect-video rounded-xl bg-slate-900 overflow-hidden flex flex-col justify-end p-4 group border border-slate-800">
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-center justify-center">
-                    {!isPlaying ? (
-                      <button onClick={() => setIsPlaying(true)} className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center hover:scale-105 transition-all text-white shadow-lg">
-                        <Play className="w-6 h-6 ml-0.5" />
-                      </button>
-                    ) : (
-                      <button onClick={() => setIsPlaying(false)} className="w-14 h-14 bg-black/40 rounded-full flex items-center justify-center hover:scale-105 opacity-0 group-hover:opacity-100 transition-all text-white shadow-lg">
-                        <Pause className="w-6 h-6" />
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Video details & controls */}
-                  <div className="w-full space-y-2 z-10">
-                    <p className="text-xs text-slate-300 font-medium truncate">Lesson 3: Advanced Balance Sheet Multiples</p>
-                    <div className="flex items-center gap-3">
-                      <button onClick={() => setIsPlaying(!isPlaying)} className="text-white hover:text-emerald-400 transition-colors">
-                        {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
-                      </button>
-                      <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer relative">
-                        <div className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full" style={{ width: `${selectedCourse.progress ?? 0}%` }} />
+                {selectedCourse.progress !== undefined ? (
+                  <>
+                    {/* Simulated Video Player */}
+                    <div className="relative aspect-video rounded-xl bg-slate-900 overflow-hidden flex flex-col justify-end p-4 group border border-slate-800">
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-center justify-center">
+                        {!isPlaying ? (
+                          <button onClick={() => setIsPlaying(true)} className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center hover:scale-105 transition-all text-white shadow-lg">
+                            <Play className="w-5 h-5 text-white ml-0.5" />
+                          </button>
+                        ) : (
+                          <button onClick={() => setIsPlaying(false)} className="w-14 h-14 bg-black/40 rounded-full flex items-center justify-center hover:scale-105 opacity-0 group-hover:opacity-100 transition-all text-white shadow-lg">
+                            <Pause className="w-6 h-6" />
+                          </button>
+                        )}
                       </div>
-                      <span className="text-[10px] text-white/80 font-mono">14:28 / 45:10</span>
-                      <Volume2 className="w-4 h-4 text-white cursor-pointer hover:text-emerald-400" />
+
+                      {/* Video details & controls */}
+                      <div className="w-full space-y-2 z-10">
+                        <p className="text-xs text-slate-300 font-medium truncate">Lesson 3: Advanced Balance Sheet Multiples</p>
+                        <div className="flex items-center gap-3">
+                          <button onClick={() => setIsPlaying(!isPlaying)} className="text-white hover:text-emerald-400 transition-colors">
+                            {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4" />}
+                          </button>
+                          <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden cursor-pointer relative">
+                            <div className="absolute top-0 left-0 h-full bg-emerald-500 rounded-full" style={{ width: `${selectedCourse.progress ?? 0}%` }} />
+                          </div>
+                          <span className="text-[10px] text-white/80 font-mono">14:28 / 45:10</span>
+                          <Volume2 className="w-4 h-4 text-white cursor-pointer hover:text-emerald-400" />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Lecture Notes */}
+                    <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4">
+                      <h4 className="font-semibold text-slate-800 dark:text-white text-xs mb-1.5">Lecture Study Notes</h4>
+                      <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
+                        Key learning outcomes: EV/EBITDA multiples should represent the core operational valuation stripped of capital structure biases. When analyzing highly leveraged sectors, prefer EV multiples over P/E ratios to avoid skewing profitability assessments. In the next section, we will calculate free cash flows (FCFF) from actual financial statements.
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div className="relative aspect-video rounded-xl bg-slate-900/95 overflow-hidden flex flex-col items-center justify-center p-6 border border-slate-800 text-center">
+                    <div className="w-14 h-14 bg-emerald-500/10 rounded-full flex items-center justify-center text-emerald-500 mb-4 animate-pulse">
+                      <Lock className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-white font-bold text-base">Unlock Premium Course</h3>
+                    <p className="text-slate-400 text-xs mt-1.5 max-w-sm leading-relaxed">
+                      Gain lifetime access to standard curriculum lectures, study notes, and the certificate program.
+                    </p>
+                    <div className="mt-5 flex items-center gap-3">
+                      <span className="text-2xl font-extrabold text-emerald-400">${selectedCourse.price}</span>
+                      <Button 
+                        className="gradient-growth text-white border-0 text-xs px-5 h-9"
+                        onClick={() => {
+                          enrollInCourse(selectedCourse.id);
+                          toast.success(`Successfully enrolled in "${selectedCourse.title}"!`);
+                        }}
+                      >
+                        Enroll & Start Learning
+                      </Button>
                     </div>
                   </div>
-                </div>
-
-                {/* Lecture Notes */}
-                <div className="bg-slate-50 dark:bg-white/5 border border-slate-200 dark:border-white/10 rounded-xl p-4">
-                  <h4 className="font-semibold text-slate-800 dark:text-white text-xs mb-1.5">Lecture Study Notes</h4>
-                  <p className="text-slate-500 dark:text-slate-400 text-xs leading-relaxed">
-                    Key learning outcomes: EV/EBITDA multiples should represent the core operational valuation stripped of capital structure biases. When analyzing highly leveraged sectors, prefer EV multiples over P/E ratios to avoid skewing profitability assessments. In the next section, we will calculate free cash flows (FCFF) from actual financial statements.
-                  </p>
-                </div>
+                )}
               </div>
 
               {/* Right Column: Syllabus & Progression */}
@@ -296,7 +312,14 @@ export default function LearningDashPage() {
                     </div>
                   </div>
 
-                  {selectedCourse.progress === 100 ? (
+                  {selectedCourse.progress === undefined ? (
+                    <Button className="w-full gradient-growth text-white border-0 text-xs h-9" onClick={() => {
+                      enrollInCourse(selectedCourse.id);
+                      toast.success(`Successfully enrolled in "${selectedCourse.title}"!`);
+                    }}>
+                      Unlock Course (${selectedCourse.price})
+                    </Button>
+                  ) : selectedCourse.progress === 100 ? (
                     <Button disabled className="w-full bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 text-xs h-9">
                       ✓ Course Completed!
                     </Button>

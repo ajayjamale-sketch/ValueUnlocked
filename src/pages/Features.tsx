@@ -102,7 +102,7 @@ export default function Features() {
       <Navbar />
 
       {/* Hero */}
-      <section className="bg-navy py-20 px-4">
+      <section className="bg-navy pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-500/30 mb-6">Platform Features</span>
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-5">

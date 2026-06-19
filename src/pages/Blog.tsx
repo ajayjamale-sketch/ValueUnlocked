@@ -42,10 +42,19 @@ export default function Blog() {
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
 
-      <section className="bg-navy py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h1 className="text-4xl font-bold text-white mb-4">Wealth <span className="text-emerald-400">Intelligence</span> Blog</h1>
-          <p className="text-slate-300 text-lg mb-8">Expert insights on investing, wealth building, and financial strategy.</p>
+      <section className="bg-navy pt-28 pb-20 px-4 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-navy via-[#0f2d1f] to-navy opacity-80" />
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b_1px,transparent_1px),linear-gradient(to_bottom,#1e293b_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-25" />
+        <div className="relative max-w-4xl mx-auto text-center">
+          <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-500/30 mb-6 animate-pulse-slow">
+            ValueUnlocked Insights
+          </span>
+          <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 tracking-tight">
+            Wealth <span className="text-gradient-emerald">Intelligence</span> Blog
+          </h1>
+          <p className="text-slate-300 text-lg mb-8 max-w-2xl mx-auto">
+            Expert insights on investing, wealth building, and financial strategy.
+          </p>
           <div className="relative max-w-xl mx-auto">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
             <Input value={query} onChange={e => setQuery(e.target.value)} className="pl-12 py-3 bg-white/10 border-white/20 text-white placeholder:text-slate-400 text-base" placeholder="Search articles..." />

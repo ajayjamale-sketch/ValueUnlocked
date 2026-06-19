@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { getStoredUser } from '@/lib/auth';
+
 
 const threads = [
   { id: 1, category: 'Value Investing', title: 'Is Berkshire still a buy at current prices?', author: 'Marcus C.', avatar: 'MC', replies: 48, views: 1240, upvotes: 124, time: '2h ago', pinned: true, color: 'from-emerald-500 to-teal-600' },
@@ -29,11 +31,15 @@ const groups = [
 const categories = ['All', 'Value Investing', 'Startups', 'AI & Tech', 'Global Markets', 'Personal Finance', 'Portfolio'];
 
 export default function Community() {
+  const navigate = useNavigate();
+  const user = getStoredUser();
   const [activeCategory, setActiveCategory] = useState('All');
+  const [searchQuery, setSearchQuery] = useState('');
   const [newPost, setNewPost] = useState('');
   const [upvoted, setUpvoted] = useState<number[]>([]);
   const [bookmarked, setBookmarked] = useState<number[]>([]);
   const [joinedGroups, setJoinedGroups] = useState<string[]>(['Value Investing Club']);
+
 
   const [activeThreads, setActiveThreads] = useState(threads);
   const [selectedThread, setSelectedThread] = useState<typeof threads[0] | null>(null);
@@ -51,24 +57,50 @@ export default function Community() {
     ]
   });
 
-  const filtered = activeThreads.filter(t => activeCategory === 'All' || t.category === activeCategory);
+  const filtered = activeThreads.filter(t => 
+    (activeCategory === 'All' || t.category === activeCategory) &&
+    (searchQuery === '' || t.title.toLowerCase().includes(searchQuery.toLowerCase()) || t.category.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
 
   const toggleUpvote = (id: number) => {
+    if (!user) {
+      toast.info('Please sign in to upvote threads.');
+      navigate('/login');
+      return;
+    }
     setUpvoted(prev => prev.includes(id) ? prev.filter(u => u !== id) : [...prev, id]);
   };
 
   const toggleBookmark = (id: number) => {
+    if (!user) {
+      toast.info('Please sign in to bookmark threads.');
+      navigate('/login');
+      return;
+    }
     setBookmarked(prev => prev.includes(id) ? prev.filter(b => b !== id) : [...prev, id]);
     toast.success(bookmarked.includes(id) ? 'Thread removed from bookmarks' : 'Thread bookmarked!');
   };
 
   const toggleGroup = (name: string) => {
+    if (!user) {
+      toast.info('Please sign in to join investment groups.');
+      navigate('/login');
+      return;
+    }
     setJoinedGroups(prev => prev.includes(name) ? prev.filter(g => g !== name) : [...prev, name]);
     toast.success(joinedGroups.includes(name) ? `Left ${name}` : `Joined ${name}!`);
   };
 
+
   const handleCreatePost = () => {
+    if (!user) {
+      toast.info('Please sign in to share a post.');
+      navigate('/login');
+      return;
+    }
     if (!newPost.trim()) return;
+
     const newThread = {
       id: activeThreads.length + 1,
       category: activeCategory === 'All' ? 'Value Investing' : activeCategory,
@@ -89,7 +121,13 @@ export default function Community() {
 
   const handleAddReply = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!user) {
+      toast.info('Please sign in to reply to threads.');
+      navigate('/login');
+      return;
+    }
     if (!selectedThread || !replyText.trim()) return;
+
 
     const newReply = {
       author: 'You',
@@ -119,7 +157,7 @@ export default function Community() {
     <div className="min-h-screen bg-white dark:bg-[#020617]">
       <Navbar />
 
-      <section className="bg-navy py-20 px-4">
+      <section className="bg-navy pt-28 pb-20 px-4">
         <div className="max-w-4xl mx-auto text-center">
           <span className="inline-block bg-emerald-500/20 text-emerald-400 text-sm font-semibold px-4 py-1.5 rounded-full border border-emerald-500/30 mb-5">Investor Community</span>
           <h1 className="text-4xl font-bold text-white mb-4">Connect with <span className="text-emerald-400">Serious Investors</span></h1>
@@ -150,11 +188,18 @@ export default function Community() {
             </div>
 
             {/* Category Filter */}
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2 items-center">
               {categories.map(c => (
-                <button key={c} onClick={() => setActiveCategory(c)} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${activeCategory === c ? 'gradient-growth text-white' : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/20'}`}>{c}</button>
+                <button key={c} onClick={() => { setActiveCategory(c); setSearchQuery(''); }} className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${activeCategory === c && !searchQuery ? 'gradient-growth text-white' : 'bg-slate-100 dark:bg-white/10 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-white/20'}`}>{c}</button>
               ))}
+              {searchQuery && (
+                <Badge variant="secondary" className="gap-1 text-xs py-1 px-2.5 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
+                  Search: {searchQuery}
+                  <X className="w-3.5 h-3.5 cursor-pointer hover:text-emerald-400" onClick={() => setSearchQuery('')} />
+                </Badge>
+              )}
             </div>
+
 
             {/* Threads */}
             <div className="space-y-3">
@@ -180,7 +225,10 @@ export default function Community() {
                           <ThumbsUp className="w-3 h-3" fill={upvoted.includes(t.id) ? 'currentColor' : 'none'} />
                           {t.upvotes + (upvoted.includes(t.id) ? 1 : 0)}
                         </button>
-                        <span className="flex items-center gap-1"><MessageSquare className="w-3 h-3" />{t.replies}</span>
+                        <button onClick={() => setSelectedThread(t)} className="flex items-center gap-1 hover:text-emerald-500 transition-colors">
+                          <MessageSquare className="w-3 h-3" />
+                          {t.replies}
+                        </button>
                         <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t.views.toLocaleString()}</span>
                       </div>
                     </div>
@@ -219,7 +267,26 @@ export default function Community() {
               <h3 className="font-semibold text-slate-800 dark:text-white text-sm mb-3">Trending Topics</h3>
               <div className="space-y-2">
                 {['#NVIDIA', '#ValueInvesting', '#IndiaMarkets', '#AIStocks', '#Dividends', '#SeriesA', '#RealEstate'].map((tag, i) => (
-                  <button key={i} onClick={() => { setActiveCategory('All'); toast.info(`Searching ${tag}...`); }} className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-400 transition-colors w-full text-left py-1">
+                  <button key={i} onClick={() => {
+                    const tagClean = tag.toLowerCase();
+                    if (tagClean === '#nvidia' || tagClean === '#aistocks') {
+                      setActiveCategory('AI & Tech');
+                      setSearchQuery('');
+                    } else if (tagClean === '#valueinvesting' || tagClean === '#dividends') {
+                      setActiveCategory('Value Investing');
+                      setSearchQuery('');
+                    } else if (tagClean === '#indiamarkets') {
+                      setActiveCategory('Global Markets');
+                      setSearchQuery('');
+                    } else if (tagClean === '#seriesa') {
+                      setActiveCategory('Startups');
+                      setSearchQuery('');
+                    } else {
+                      setActiveCategory('All');
+                      setSearchQuery(tag.slice(1));
+                    }
+                    toast.success(`Filtered feed by ${tag}`);
+                  }} className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-emerald-400 transition-colors w-full text-left py-1">
                     <Hash className="w-3.5 h-3.5" /> {tag.slice(1)}
                   </button>
                 ))}
@@ -236,7 +303,14 @@ export default function Community() {
                   <div key={i} className="p-2 bg-white/10 rounded-lg">
                     <p className="text-xs font-medium text-white">{session.title}</p>
                     <p className="text-[10px] text-slate-400 mt-0.5">by {session.host} · {session.time}</p>
-                    <Button size="sm" className="mt-2 h-6 text-[10px] gradient-growth text-white border-0 w-full" onClick={() => toast.success(`Registered for ${session.title}`)}>
+                    <Button size="sm" className="mt-2 h-6 text-[10px] gradient-growth text-white border-0 w-full" onClick={() => {
+                      if (!user) {
+                        toast.info('Please sign in to register for sessions.');
+                        navigate('/login');
+                        return;
+                      }
+                      toast.success(`Registered for ${session.title}`);
+                    }}>
                       Register
                     </Button>
                   </div>

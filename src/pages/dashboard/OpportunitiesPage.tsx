@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Compass, Filter, TrendingUp, Zap, X, AlertTriangle, CheckCircle, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import OpportunityCard from '@/components/features/OpportunityCard';
@@ -6,6 +6,7 @@ import { opportunities } from '@/lib/mockData';
 import { toast } from 'sonner';
 import { useDashboard } from '@/context/DashboardContext';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts';
+import { useLocation } from 'react-router-dom';
 
 const types = ['All', 'Stock', 'Sector', 'Startup', 'Acquisition', 'Franchise'];
 const risks = ['All Risks', 'Low', 'Medium', 'High'];
@@ -32,9 +33,31 @@ const simulatedChartData: Record<string, Array<{ month: string, target: number, 
 
 export default function OpportunitiesPage() {
   const { watchlist, toggleWatchlist, addPosition } = useDashboard();
+  const location = useLocation();
   const [type, setType] = useState('All');
   const [risk, setRisk] = useState('All Risks');
   const [selectedOpp, setSelectedOpp] = useState<typeof opportunities[0] | null>(null);
+  const [isBuying, setIsBuying] = useState(false);
+  const [buyQty, setBuyQty] = useState('10');
+  const [buyPrice, setBuyPrice] = useState(0);
+  const [buyTicker, setBuyTicker] = useState('OPP');
+
+  useEffect(() => {
+    if (location.state?.openOppId) {
+      const opp = opportunities.find(o => o.id === location.state.openOppId);
+      if (opp) {
+        setSelectedOpp(opp);
+        setIsBuying(false);
+      }
+      // Clear location state to prevent reopening on reload
+      window.history.replaceState({}, document.title);
+    }
+  }, [location]);
+
+  const handleOpenOpp = (opp: typeof opportunities[0]) => {
+    setSelectedOpp(opp);
+    setIsBuying(false);
+  };
 
   const filtered = opportunities.filter(o => {
     const typeMatch = type === 'All' || o.type.toLowerCase() === type.toLowerCase();
@@ -42,21 +65,27 @@ export default function OpportunitiesPage() {
     return typeMatch && riskMatch;
   });
 
-  const handleBuyFromOpportunity = (opp: typeof opportunities[0]) => {
-    // Determine ticker
+  const handleBuyClick = (opp: typeof opportunities[0]) => {
     let ticker = opp.title.split(' ')[0].toUpperCase();
     if (ticker.length > 5 || ticker.includes('AI') || ticker.includes('CLEANTECH')) {
       ticker = 'OPP';
     }
     const price = opp.risk === 'low' ? 45 : opp.risk === 'medium' ? 120 : 250;
-    const qtyStr = window.prompt(`Enter quantity of ${ticker} to buy at $${price} per share:`, "10");
-    if (qtyStr === null) return;
-    const qty = parseInt(qtyStr);
+    setBuyTicker(ticker);
+    setBuyPrice(price);
+    setBuyQty('10');
+    setIsBuying(true);
+  };
+
+  const confirmBuy = () => {
+    if (!selectedOpp) return;
+    const qty = parseInt(buyQty);
     if (isNaN(qty) || qty <= 0) {
-      toast.error('Invalid quantity entered.');
+      toast.error('Please enter a valid quantity.');
       return;
     }
-    addPosition(ticker, opp.title, opp.type === 'startup' ? 'startup' : 'stock', qty, price);
+    addPosition(buyTicker, selectedOpp.title, selectedOpp.type === 'startup' ? 'startup' : 'stock', qty, buyPrice);
+    setIsBuying(false);
     setSelectedOpp(null);
   };
 
@@ -86,7 +115,7 @@ export default function OpportunitiesPage() {
           <OpportunityCard
             key={opp.id}
             opportunity={opp}
-            onAction={() => setSelectedOpp(opp)}
+            onAction={() => handleOpenOpp(opp)}
             onBookmark={() => toggleWatchlist(opp.title)}
             isBookmarked={watchlist.includes(opp.title)}
           />
@@ -95,7 +124,7 @@ export default function OpportunitiesPage() {
 
       {/* AI Opportunity Analysis Modal */}
       {selectedOpp && (
-        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto" onClick={() => setSelectedOpp(null)}>
+        <div className="fixed inset-0 z-50 bg-black/60 flex items-start sm:items-center justify-center p-4 overflow-y-auto pt-24 pb-8" onClick={() => setSelectedOpp(null)}>
           <div className="bg-white dark:bg-[#0F172A] rounded-2xl border border-slate-200 dark:border-white/10 p-6 w-full max-w-2xl shadow-2xl my-auto animate-in fade-in zoom-in-95 duration-150 relative my-8" onClick={e => e.stopPropagation()}>
             {/* Header */}
             <div className="flex items-start justify-between mb-4 border-b border-slate-100 dark:border-white/10 pb-4">
@@ -164,9 +193,46 @@ export default function OpportunitiesPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Button className="w-full gradient-growth text-white border-0 text-xs" onClick={() => handleBuyFromOpportunity(selectedOpp)}>
-                    Buy / Invest Position
-                  </Button>
+                  {isBuying ? (
+                    <div className="p-3 bg-slate-50 dark:bg-white/5 rounded-xl border border-slate-200 dark:border-white/10 text-left space-y-3">
+                      <p className="text-xs font-semibold text-slate-700 dark:text-slate-300">Confirm Purchase</p>
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-450 font-medium">Quantity</label>
+                        <Input 
+                          type="number" 
+                          min={1} 
+                          value={buyQty} 
+                          onChange={e => setBuyQty(e.target.value)} 
+                          className="h-8 text-xs"
+                        />
+                      </div>
+                      <div className="flex justify-between text-xs font-semibold text-slate-700 dark:text-slate-350">
+                        <span>Total Price:</span>
+                        <span>${(parseInt(buyQty || '0') * buyPrice).toLocaleString()}</span>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button 
+                          size="sm" 
+                          className="flex-1 gradient-growth text-white border-0 text-[10px] h-7"
+                          onClick={confirmBuy}
+                        >
+                          Confirm
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline" 
+                          className="flex-1 text-[10px] h-7"
+                          onClick={() => setIsBuying(false)}
+                        >
+                          Cancel
+                        </Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <Button className="w-full gradient-growth text-white border-0 text-xs" onClick={() => handleBuyClick(selectedOpp)}>
+                      Buy / Invest Position
+                    </Button>
+                  )}
                   <Button variant="outline" className="w-full text-xs" onClick={() => { toggleWatchlist(selectedOpp.title); setSelectedOpp(null); }}>
                     {watchlist.includes(selectedOpp.title) ? 'Remove Watchlist' : 'Add Watchlist'}
                   </Button>
