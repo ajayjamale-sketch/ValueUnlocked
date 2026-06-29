@@ -45,6 +45,21 @@ export default function DashboardLayout({ children, title }: Props) {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
+  const [notifications, setNotifications] = useState([
+    { id: 1, title: 'Security Alert', message: 'New login detected from unrecognized device.', time: '10m ago', unread: true },
+    { id: 2, title: 'Research Update', message: 'New valuation report published for Apple (AAPL).', time: '1h ago', unread: true },
+    { id: 3, title: 'Portfolio Rebalanced', message: 'Your portfolio has been successfully rebalanced.', time: '1d ago', unread: false },
+  ]);
+
+  const markAllRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+    toast.success('All notifications marked as read.');
+  };
+
+  const markAsRead = (id: number) => {
+    setNotifications(prev => prev.map(n => n.id === id ? { ...n, unread: false } : n));
+  };
+
   if (!user) return null;
 
   return (
@@ -86,18 +101,47 @@ export default function DashboardLayout({ children, title }: Props) {
             <button onClick={toggleTheme} className="p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors">
               {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
-            <button 
-              onClick={() => toast.info('You have 2 new security alerts and 1 research report update.', { 
-                action: { 
-                  label: 'View Settings', 
-                  onClick: () => navigate('/dashboard/settings') 
-                } 
-              })}
-              className="relative p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors"
-            >
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full border border-white dark:border-navy"></span>
-            </button>
+            
+            {/* Notifications Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="relative p-2 rounded-lg text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/10 transition-colors focus:outline-none">
+                  <Bell className="w-4 h-4" />
+                  {notifications.some(n => n.unread) && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-emerald-500 rounded-full border border-white dark:border-navy"></span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-80 bg-white dark:bg-navy border border-slate-200 dark:border-white/10 rounded-xl shadow-xl py-2 z-50">
+                <div className="flex items-center justify-between px-4 py-1.5 border-b border-slate-100 dark:border-white/10 mb-1">
+                  <span className="text-xs font-semibold text-slate-800 dark:text-white">Notifications</span>
+                  {notifications.some(n => n.unread) && (
+                    <button onClick={markAllRead} className="text-[10px] text-emerald-500 hover:text-emerald-600 font-medium">Mark all read</button>
+                  )}
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {notifications.length === 0 ? (
+                    <div className="text-center py-6 text-xs text-slate-400">No notifications.</div>
+                  ) : (
+                    notifications.map(n => (
+                      <DropdownMenuItem
+                        key={n.id}
+                        onClick={() => markAsRead(n.id)}
+                        className={`flex flex-col items-start gap-1 px-4 py-2.5 cursor-pointer hover:bg-slate-50 dark:hover:bg-white/5 focus:bg-slate-50 dark:focus:bg-white/5 transition-colors ${n.unread ? 'bg-slate-50/50 dark:bg-white/5' : ''}`}
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className={`text-xs font-semibold ${n.unread ? 'text-slate-800 dark:text-white' : 'text-slate-600 dark:text-slate-400'}`}>
+                            {n.title}
+                          </span>
+                          <span className="text-[10px] text-slate-450">{n.time}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-550 dark:text-slate-400 leading-snug">{n.message}</p>
+                      </DropdownMenuItem>
+                    ))
+                  )}
+                </div>
+              </DropdownMenuContent>
+            </DropdownMenu>
             
             {/* User Profile Dropdown Menu */}
             <DropdownMenu>

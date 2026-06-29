@@ -335,15 +335,15 @@ export default function AnalyticsPage() {
   const premium = userList.filter(u => u.plan !== 'starter').length;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-full overflow-hidden">
       {/* Controls */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-xl">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 w-full">
+        <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-xl overflow-x-auto scrollbar-hide max-w-full w-full sm:w-auto">
           {(['performance', 'risk', 'allocation', ...(isAdmin ? ['reports', 'users'] : [])] as const).map(v => (
             <button
               key={v}
               onClick={() => handleViewChange(v as any)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium capitalize transition-all shrink-0 ${
                 activeView === v
                   ? 'bg-white dark:bg-navy text-slate-800 dark:text-white shadow-sm'
                   : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
@@ -353,8 +353,8 @@ export default function AnalyticsPage() {
             </button>
           ))}
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-xl">
+        <div className="flex items-center gap-2 flex-wrap w-full sm:w-auto">
+          <div className="flex gap-1 p-1 bg-slate-100 dark:bg-white/5 rounded-xl overflow-x-auto scrollbar-hide max-w-full w-full sm:w-auto">
             {periods.map(p => (
               <button
                 key={p}
@@ -362,7 +362,7 @@ export default function AnalyticsPage() {
                   setActivePeriod(p);
                   refreshData(); // also refresh when period changes
                 }}
-                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all shrink-0 ${
                   activePeriod === p
                     ? 'bg-white dark:bg-navy text-slate-800 dark:text-white shadow-sm'
                     : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
